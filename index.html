@@ -3,127 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Tích điểm đổi quà </title>
+    <title> Tích Điểm</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --bg-clean: #ffffff;
-            --text-main: #1a1a1a;
-            --text-muted: #666666;
-            --border-color: #e0e0e0;
-            --accent-pink: #ffd6ba;
-            --accent-green: #d8f3dc;
-            --accent-gray: #f5f5f5;
+            --bg-body: #fff5f5;
+            --bg-card: #ffffff;
+            --text-main: #2b2b2b;
+            --text-muted: #8a7a7a;
+            --border: #ffe3e3;
+            --pastel-pink: #ffe5ec;
+            --pastel-pink-dark: #ffb3c6;
+            --pastel-green: #e8f5e9;
+            --accent-green: #388e3c;
+            --accent-red: #d32f2f;
+            --shadow: 0 12px 40px rgba(255, 179, 198, 0.15);
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-sm: 12px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: var(--accent-gray); color: var(--text-main); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 15px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: var(--bg-body); color: var(--text-main); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; -webkit-font-smoothing: antialiased; }
         
-        /* --- MÀN HÌNH LOADING MINIMALIST --- */
-        #loading-screen { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg-clean); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .loading-icon { font-size: 40px; color: var(--text-main); animation: rotate 1.5s infinite linear; }
-        .loading-text { margin-top: 15px; font-weight: 500; font-size: 14px; letter-spacing: 1px; color: var(--text-muted); }
-        @keyframes rotate { to { transform: rotate(360deg); } }
+        /* --- CUSTOM NOTIFICATION (TOAST) --- */
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: var(--bg-card); color: var(--text-main); padding: 14px 24px; border-radius: var(--radius-sm); box-shadow: 0 10px 30px rgba(0,0,0,0.08); border-left: 4px solid var(--pastel-pink-dark); font-size: 13px; font-weight: 700; min-width: 250px; animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards; transform: translateX(120%); }
+        @keyframes slideIn { to { transform: translateX(0); } }
+        @keyframes fadeOut { to { opacity: 0; transform: translateX(120%); } }
 
-        /* --- CONTAINER CHÍNH --- */
-        .app-container { width: 100%; max-width: 520px; background: var(--bg-clean); border-radius: 20px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); border: 1px solid var(--border-color); padding: 25px; position: relative; display: none; }
-        
-        h1 { text-align: center; font-size: 24px; font-weight: 700; margin-bottom: 20px; letter-spacing: -0.5px; }
-        
-        /* Bảng điểm to, rõ ràng */
-        .score-box { background: var(--bg-clean); padding: 25px 15px; border-radius: 16px; text-align: center; margin-bottom: 25px; border: 1px solid var(--border-color); }
-        .score-num { font-size: 56px; font-weight: 800; color: var(--text-main); line-height: 1; margin-bottom: 10px; }
-        .streak-info { font-size: 14px; font-weight: 600; color: var(--text-muted); background: var(--accent-gray); display: inline-block; padding: 6px 16px; border-radius: 20px; }
+        /* --- LOADING SCREEN --- */
+        #loading-screen { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg-body); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .loading-text { font-size: 16px; font-weight: 800; color: var(--pastel-pink-dark); letter-spacing: 2px; animation: blink 1.2s infinite ease-in-out; }
+        @keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
-        /* Khối tính năng chính (Làm to lên) */
-        .section-title { font-size: 16px; font-weight: 700; margin: 25px 0 12px 0; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; }
+        /* --- FRAME CONTAINER CHÍNH --- */
+        .app-container { width: 100%; max-width: 500px; background: var(--bg-card); border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 30px; position: relative; display: none; border: 1px solid var(--border); }
         
-        .main-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .action-card-btn { background: var(--bg-clean); border: 1px solid var(--border-color); padding: 16px; border-radius: 12px; cursor: pointer; text-align: left; transition: all 0.2s; display: flex; align-items: center; gap: 12px; }
-        .action-card-btn:hover { background: var(--accent-gray); border-color: var(--text-main); }
-        .action-card-btn i { font-size: 20px; }
+        h1 { text-align: center; font-size: 20px; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 25px; color: var(--text-main); }
+        
+        /* Dashboard điểm số */
+        .score-box { background: var(--pastel-pink); padding: 35px 20px; border-radius: var(--radius-md); text-align: center; margin-bottom: 25px; position: relative; }
+        .score-num { font-size: 64px; font-weight: 900; color: var(--text-main); letter-spacing: -2px; line-height: 1; margin-bottom: 12px; }
+        .streak-info { font-size: 13px; font-weight: 700; color: var(--text-main); background: var(--bg-card); padding: 6px 16px; border-radius: 30px; display: inline-block; }
 
-        /* --- KHU VƯỜN TRỒNG CÂY 6 Ô --- */
-        .garden-layout { display: flex; gap: 15px; margin-top: 10px; }
+        /* Menu nhanh */
+        .main-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 30px; }
+        .action-card-btn { background: var(--bg-card); border: 1px solid var(--border); padding: 18px; border-radius: var(--radius-md); cursor: pointer; text-align: left; transition: all 0.2s ease; display: flex; align-items: center; gap: 14px; }
+        .action-card-btn:hover { background: var(--pastel-pink); border-color: var(--pastel-pink-dark); transform: translateY(-2px); }
+        .action-card-btn i { font-size: 22px; color: var(--text-main); }
+        .action-card-btn .btn-title { font-weight: 700; font-size: 14px; margin-bottom: 2px; }
+        .action-card-btn .btn-desc { font-size: 11px; color: var(--text-muted); }
+
+        .section-title { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-main); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+        
+        /* --- KHU VƯỜN 6 Ô --- */
+        .garden-layout { display: flex; gap: 15px; margin-bottom: 30px; }
         .garden-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; flex: 1; }
-        .plot { aspect-ratio: 1; background: var(--accent-gray); border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; cursor: pointer; transition: 0.2s; }
-        .plot:hover { border-color: var(--text-main); }
-        .plot-emoji { font-size: 28px; }
-        .plot-timer { font-size: 10px; background: var(--text-main); color: white; padding: 2px 6px; border-radius: 6px; position: absolute; bottom: 6px; }
+        .plot { aspect-ratio: 1; background: var(--bg-body); border-radius: var(--radius-sm); border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; cursor: pointer; transition: all 0.2s ease; }
+        .plot:hover { background: var(--pastel-pink); border-color: var(--pastel-pink-dark); transform: scale(1.02); }
+        .plot-emoji { font-size: 26px; }
+        .plot-timer { font-size: 10px; font-weight: 700; background: var(--text-main); color: white; padding: 2px 6px; border-radius: 6px; position: absolute; bottom: 6px; }
         
-        .seed-sidebar { width: 110px; background: var(--accent-gray); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 8px; max-height: 230px; overflow-y: auto; border: 1px solid var(--border-color); }
-        .seed-item { background: var(--bg-clean); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: 600; cursor: pointer; text-align: center; }
-        .seed-item.selected { border-color: var(--text-main); background: var(--accent-pink); }
+        .seed-sidebar { width: 120px; background: var(--bg-body); border-radius: var(--radius-md); padding: 10px; display: flex; flex-direction: column; gap: 8px; max-height: 204px; overflow-y: auto; border: 1px solid var(--border); }
+        .seed-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 4px; display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: 700; cursor: pointer; text-align: center; transition: all 0.2s ease; }
+        .seed-item:hover { border-color: var(--pastel-pink-dark); }
+        .seed-item.selected { border-color: var(--pastel-pink-dark); background: var(--pastel-pink); }
 
-        /* --- DANH SÁCH / TIỆM ĐỔI QUÀ --- */
-        .list-group { display: flex; flex-direction: column; gap: 8px; max-height: 260px; overflow-y: auto; }
-        .item-card { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--bg-clean); border: 1px solid var(--border-color); border-radius: 12px; }
-        .item-info { display: flex; flex-direction: column; gap: 2px; }
-        .item-title { font-weight: 600; font-size: 14px; }
-        .item-val { font-size: 12px; font-weight: 700; }
-        .val-plus { color: #2e7d32; }
-        .val-minus { color: #c62828; }
+        /* --- LIST CARD CHI TIẾT --- */
+        .list-group { display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto; padding-right: 4px; }
+        .item-card { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+        .item-info { display: flex; flex-direction: column; gap: 3px; max-width: 70%; }
+        .item-title { font-weight: 600; font-size: 14px; line-height: 1.3; }
+        .item-val { font-size: 12px; font-weight: 700; display: inline-block; width: fit-content; }
+        .val-plus { color: var(--accent-green); }
+        .val-minus { color: var(--accent-red); }
 
-        .btn-action { padding: 8px 16px; border: 1px solid var(--text-main); border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; background: var(--bg-clean); color: var(--text-main); transition: 0.2s; }
-        .btn-action:hover { background: var(--text-main); color: var(--bg-clean); }
+        .btn-action { padding: 8px 16px; border: 1px solid var(--text-main); border-radius: var(--radius-sm); font-weight: 700; font-size: 12px; cursor: pointer; background: var(--bg-card); color: var(--text-main); transition: all 0.2s ease; }
+        .btn-action:hover { background: var(--text-main); color: var(--bg-card); }
 
-        /* --- NHẬT KÝ HOẠT ĐỘNG --- */
-        .history-box { margin-top: 25px; background: var(--accent-gray); border-radius: 14px; padding: 15px; border: 1px solid var(--border-color); }
-        .history-title { font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .history-list { max-height: 120px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
-        .history-item { padding: 6px 10px; background: var(--bg-clean); border-radius: 8px; font-size: 12px; border: 1px solid var(--border-color); }
+        /* --- LOG NHẬT KÝ --- */
+        .history-box { background: var(--bg-body); border-radius: var(--radius-md); padding: 20px; border: 1px solid var(--border); }
+        .history-title { font-size: 12px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+        .history-list { max-height: 110px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+        .history-item { padding: 8px 12px; background: var(--bg-card); border-radius: 8px; font-size: 12px; border: 1px solid var(--border); line-height: 1.4; }
 
-        /* --- POPUP NỔI --- */
-        .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.2); z-index: 1000; display: none; justify-content: center; align-items: center; padding: 20px; }
-        .popup { background: var(--bg-clean); border-radius: 16px; padding: 24px; width: 100%; max-width: 440px; position: relative; border: 1px solid var(--border-color); }
-        .close-popup { position: absolute; top: 20px; right: 20px; font-size: 18px; cursor: pointer; color: var(--text-muted); }
+        /* --- POPUP MODAL --- */
+        .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(43, 43, 43, 0.2); backdrop-filter: blur(4px); z-index: 1000; display: none; justify-content: center; align-items: center; padding: 15px; }
+        .popup { background: var(--bg-card); border-radius: var(--radius-lg); padding: 28px; width: 100%; max-width: 420px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.06); border: 1px solid var(--border); }
+        .close-popup { position: absolute; top: 22px; right: 22px; font-size: 16px; cursor: pointer; color: var(--text-muted); transition: 0.2s; }
+        .close-popup:hover { color: var(--text-main); }
         
+        /* Giao diện nhập mật khẩu xịn */
+        .pwd-input { width: 100%; padding: 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 16px; font-weight: 600; text-align: center; letter-spacing: 4px; margin-top: 15px; background: var(--bg-body); outline: none; }
+        .pwd-input:focus { border-color: var(--pastel-pink-dark); background: #fff; }
+
+        /* Lưới điểm danh */
         .attendance-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 15px; }
-        .day-box { background: var(--accent-gray); border-radius: 8px; padding: 12px 6px; text-align: center; font-size: 12px; font-weight: 600; border: 1px solid var(--border-color); }
-        .day-box.checked { background: var(--accent-green); border-color: #2e7d32; }
+        .day-box { background: var(--bg-body); border-radius: var(--radius-sm); padding: 14px 6px; text-align: center; font-size: 12px; font-weight: 700; color: var(--text-muted); border: 1px solid var(--border); }
+        .day-box.checked { background: var(--pastel-green); color: var(--accent-green); border-color: #a5d6a7; }
 
-        /* Nút admin bí mật nhỏ gọn ở góc */
-        .admin-secret-btn { position: absolute; bottom: 15px; right: 20px; font-size: 12px; color: var(--text-muted); background: none; border: none; cursor: pointer; text-decoration: underline; }
+        .admin-secret-btn { position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); font-size: 11px; color: var(--text-muted); background: none; border: none; cursor: pointer; text-decoration: none; font-weight: 600; letter-spacing: 0.5px; }
+        .admin-secret-btn:hover { color: var(--pastel-pink-dark); }
+
+        .tabs-header { display: flex; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+        .tab-link { font-size: 14px; font-weight: 800; background: none; border: none; cursor: pointer; color: var(--text-muted); padding-bottom: 4px; }
+        .tab-link.active { color: var(--text-main); border-bottom: 2px solid var(--text-main); }
     </style>
 </head>
 <body>
 
-    <!-- 1. MÀN HÌNH LOADING MINIMALIST -->
+    <!-- 1. CUSTOM NOTIFICATION CONTAINER -->
+    <div id="toast-container"></div>
+
+    <!-- 2. LOADING SCREEN -->
     <div id="loading-screen">
-        <div class="loading-icon"><i class="fas fa-circle-notch"></i></div>
-        <div class="loading-text">LOADING...</div>
+        <div class="loading-text">LOADINGGG...</div>
     </div>
 
-    <!-- 2. GIAO DIỆN CHÍNH (VÀO LÀ RA GIAO DIỆN BẠN NAM LUÔN) -->
+    <!-- 3. MAIN APP FRAME -->
     <div class="app-container" id="main-app">
-        <h1>HỆ THỐNG TÍCH ĐIỂM</h1>
+        <h1>BẢNG ĐIỀU PHỐI ĐIỂM</h1>
 
-        <!-- KHỐI ĐIỂM SỐ TO RÕ RÀNG -->
         <div class="score-box">
             <div class="score-num" id="total-score">0</div>
-            <div class="streak-info" id="streak-text">Chuỗi đăng nhập: 0 ngày</div>
+            <div class="streak-info" id="streak-text">Chuỗi tích lũy: 0 ngày</div>
         </div>
 
-        <!-- CÁC HÀNH ĐỘNG CHÍNH -->
         <div class="main-actions">
             <button class="action-card-btn" onclick="openPopup('pop-attendance')">
-                <i class="fas fa-calendar-check"></i>
+                <i class="fas fa-check-circle"></i>
                 <div>
-                    <div style="font-weight:700; font-size:15px;">Điểm Danh</div>
-                    <div style="font-size:12px; color:var(--text-muted);">Nhận điểm hàng ngày</div>
+                    <div class="btn-title">Điểm Danh</div>
+                    <div class="btn-desc">Nhận thưởng mỗi ngày</div>
                 </div>
             </button>
             <button class="action-card-btn" onclick="openPopup('pop-shop')">
-                <i class="fas fa-store"></i>
+                <i class="fas fa-shopping-bag"></i>
                 <div>
-                    <div style="font-weight:700; font-size:15px;">Tiệm Đổi Quà</div>
-                    <div style="font-size:12px; color:var(--text-muted);">Sử dụng điểm tích lũy</div>
+                    <div class="btn-title">Tiệm Đổi Quà</div>
+                    <div class="btn-desc">Sử dụng điểm quy đổi</div>
                 </div>
             </button>
         </div>
 
-        <!-- KHU VƯỜN TRỒNG CÂY TÍCH ĐIỂM -->
-        <div class="section-title"><i class="fas fa-seedling"></i> Khu Vườn Trồng Cây Tích Điểm</div>
+        <div class="section-title"><i class="fas fa-seedling"></i> Trồng cây thu hoạch điểm</div>
         <div class="garden-layout">
             <div class="garden-grid">
                 <div class="plot" onclick="clickPlot(0)"><span class="plot-emoji" id="p-emoji-0">◼️</span><div class="plot-timer" id="p-time-0" style="display:none;"></div></div>
@@ -136,57 +160,63 @@
             <div class="seed-sidebar" id="sidebar-seeds"></div>
         </div>
 
-        <!-- NHẬT KÝ HOẠT ĐỘNG BIẾN ĐỘNG ĐIỂM -->
         <div class="history-box">
-            <div class="history-title">Nhật ký hoạt động công khai</div>
+            <div class="history-title">Nhật ký hoạt động hệ thống</div>
             <div class="history-list" id="history-logs">
-                <div class="history-item">Hệ thống đang đồng bộ dữ liệu...</div>
+                <div class="history-item">Đang đồng bộ cơ sở dữ liệu...</div>
             </div>
         </div>
 
-        <!-- NÚT ĐIỀU KHIỂN THÊM ĐIỂM ẨN CÓ MẬT KHẨU -->
-        <button class="admin-secret-btn" onclick="accessAdminPanel()">[Quản trị viên]</button>
+        <button class="admin-secret-btn" onclick="openPopup('pop-auth')">[ Quản trị viên ]</button>
     </div>
 
-    <!-- ================= HỆ THỐNG POPUPS ================= -->
+    <!-- ================= POPUP MODALS ================= -->
 
-    <!-- POPUP 1: ĐIỂM DANH -->
-    <div class="overlay" id="pop-attendance">
-        <div class="popup">
-            <i class="fas fa-times close-popup" onclick="closePopup('pop-attendance')"></i>
-            <h3 style="font-weight:700; margin-bottom:5px;">Điểm Danh Hàng Tuần</h3>
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">Mỗi ngày nhận +5 Điểm thưởng.</p>
-            <div class="attendance-grid" id="grid-days"></div>
-            <button class="btn-action" style="width:100%; margin-top:20px; padding:12px; background:var(--text-main); color:white;" onclick="claimDailyAttendance()">XÁC NHẬN ĐIỂM DANH HÔM NAY</button>
+    <!-- POPUP: NHẬP MẬT KHẨU BẢO MẬT -->
+    <div class="overlay" id="pop-auth">
+        <div class="popup" style="max-width: 360px; text-align: center;">
+            <i class="fas fa-times close-popup" onclick="closePopup('pop-auth')"></i>
+            <h3 style="font-size:16px; font-weight:800; margin-bottom:6px;">Xác Thực Quyền QTV</h3>
+            <p style="font-size:12px; color:var(--text-muted);">Vui lòng nhập mã pin mã hóa để tiếp tục</p>
+            <input type="password" id="admin-password-input" class="pwd-input" placeholder="•••••" maxlength="8">
+            <button class="btn-action" style="width:100%; margin-top:15px; padding:12px; background:var(--text-main); color:white;" onclick="verifyAdminPassword()">XÁC NHẬN TRUY CẬP</button>
         </div>
     </div>
 
-    <!-- POPUP 2: TIỆM ĐỔI QUÀ -->
+    <!-- DIALOG ĐIỂM DANH -->
+    <div class="overlay" id="pop-attendance">
+        <div class="popup">
+            <i class="fas fa-times close-popup" onclick="closePopup('pop-attendance')"></i>
+            <h3 style="font-size:16px; font-weight:800; margin-bottom:4px;">Điểm Danh Hàng Tuần</h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Hệ thống tự động cộng +5 điểm thưởng.</p>
+            <div class="attendance-grid" id="grid-days"></div>
+            <button class="btn-action" style="width:100%; margin-top:25px; padding:14px; background:var(--text-main); color:white;" onclick="claimDailyAttendance()">ĐIỂM DANH HÔM NAY</button>
+        </div>
+    </div>
+
+    <!-- DIALOG TIỆM ĐỔI QUÀ -->
     <div class="overlay" id="pop-shop">
         <div class="popup">
             <i class="fas fa-times close-popup" onclick="closePopup('pop-shop')"></i>
-            <h3 style="font-weight:700; margin-bottom:15px;">Tiệm Đổi Quà Tặng</h3>
+            <h3 style="font-size:16px; font-weight:800; margin-bottom:20px;">Tiệm Đổi Quà Tặng</h3>
             <div class="list-group" id="list-shop-items"></div>
         </div>
     </div>
 
-    <!-- POPUP BẢNG ĐIỀU KHIỂN CỦA QUẢN TRỊ VIÊN (CHỈ HIỆN KHI NHẬP ĐÚNG MK) -->
+    <!-- DIALOG BẢNG ĐIỀU PHỐI ĐIỂM -->
     <div class="overlay" id="pop-admin-panel">
-        <div class="popup" style="max-width:480px;">
+        <div class="popup" style="max-width:460px;">
             <i class="fas fa-times close-popup" onclick="closePopup('pop-admin-panel')"></i>
-            <h3 style="font-weight:700; margin-bottom:15px;">Bảng Điều Phối Điểm Số</h3>
-            
-            <div style="display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
-                <button id="tab-add" style="font-weight:700; background:none; border:none; cursor:pointer; padding:5px 10px;" onclick="switchAdminTab('add')">BẢNG CỘNG ĐIỂM</button>
-                <button id="tab-sub" style="font-weight:700; background:none; border:none; cursor:pointer; padding:5px 10px; color:var(--text-muted);" onclick="switchAdminTab('sub')">BẢNG TRỪ ĐIỂM</button>
+            <div class="tabs-header">
+                <button id="tab-add" class="tab-link active" onclick="switchAdminTab('add')">CỘNG ĐIỂM</button>
+                <button id="tab-sub" class="tab-link" onclick="switchAdminTab('sub')">TRỪ ĐIỂM</button>
             </div>
-
             <div id="admin-add-list" class="list-group"></div>
             <div id="admin-sub-list" class="list-group" style="display:none;"></div>
         </div>
     </div>
 
-    <!-- ================= SCRIPT XỬ LÝ DATABASE ================= -->
+    <!-- ================= CORE LOGIC SYSTEM ================= -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, onValue, set, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -200,7 +230,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // --- CẤU HÌNH DỮ LIỆU ĐIỂM THEO DANH SÁCH KHÔNG TRẨU ---
         const plusActions = [
             { text: "Chúc buổi sáng / buổi tối", pts: 10 },
             { text: "Ăn uống đủ 3 bữa", pts: 10 },
@@ -252,15 +281,23 @@
         let lastAttendanceDate = "";
         let localPlots = Array(6).fill({ status: 'empty', plantKey: '', timeEnd: 0 });
 
-        // --- ĐỢI LOADING ---
+        // --- CUSTOM TOAST MESSAGE ---
+        window.showToast = function(msg) {
+            const container = document.getElementById('toast-container');
+            const el = document.createElement('div');
+            el.className = 'toast';
+            el.innerText = msg;
+            container.appendChild(el);
+            setTimeout(() => el.remove(), 3000);
+        };
+
         window.addEventListener('load', () => {
             setTimeout(() => {
                 document.getElementById('loading-screen').style.display = 'none';
                 document.getElementById('main-app').style.display = 'block';
-            }, 1000);
+            }, 1200);
         });
 
-        // --- LISTENERS ĐỒNG BỘ REALTIME ---
         onValue(ref(db, 'score'), (snapshot) => {
             currentScore = snapshot.val() || 0;
             document.getElementById('total-score').innerText = Number(currentScore).toFixed(1).replace('.0', '');
@@ -268,7 +305,7 @@
 
         onValue(ref(db, 'streak'), (snapshot) => {
             currentStreak = snapshot.val() || 0;
-            document.getElementById('streak-text').innerText = `Chuỗi đăng nhập: ${currentStreak} ngày`;
+            document.getElementById('streak-text').innerText = `Chuỗi tích lũy: ${currentStreak} ngày`;
         });
 
         onValue(ref(db, 'history'), (snapshot) => {
@@ -283,7 +320,7 @@
                     logBox.appendChild(div);
                 });
             } else {
-                logBox.innerHTML = '<div class="history-item">Không có lịch sử biến động.</div>';
+                logBox.innerHTML = '<div class="history-item">Không có lịch sử hoạt động.</div>';
             }
         });
 
@@ -293,7 +330,6 @@
             renderGardenGrid();
         });
 
-        // --- KHỞI TẠO INTERFACE ---
         function initApp() {
             document.getElementById('admin-add-list').innerHTML = plusActions.map(m => `
                 <div class="item-card">
@@ -311,7 +347,7 @@
                         <span class="item-title">${m.text}</span>
                         <span class="item-val val-minus">${m.pts}đ</span>
                     </div>
-                    <button class="btn-action" style="color:#c62828; border-color:#c62828;" onclick="modifyPoints(${m.pts}, '${m.text}')">Trừ</button>
+                    <button class="btn-action" style="color:var(--accent-red); border-color:var(--accent-red);" onclick="modifyPoints(${m.pts}, '${m.text}')">Trừ</button>
                 </div>
             `).join('');
 
@@ -319,7 +355,7 @@
                 <div class="item-card">
                     <div class="item-info">
                         <span class="item-title">${g.text}</span>
-                        <span class="item-val" style="color:var(--text-muted);">Chi phí: ${g.cost}đ</span>
+                        <span class="item-val" style="color:var(--text-muted);">Giá: ${g.cost}đ</span>
                     </div>
                     <button class="btn-action" onclick="redeemGift(${g.cost}, '${g.text}')">Đổi quà</button>
                 </div>
@@ -329,34 +365,35 @@
                 const f = flowersCatalog[key];
                 return `
                     <div class="seed-item" id="seed-${key}" onclick="selectSeed('${key}')">
-                        <span style="font-size:18px;">${f.emoji}</span>
-                        <div style="margin-top:2px;">${f.name}</div>
-                        <div style="color:var(--text-muted); font-size:10px;">${f.buy}đ</div>
+                        <span style="font-size:20px; margin-bottom:4px;">${f.emoji}</span>
+                        <div style="font-size:11px; color:var(--text-main); line-height:1.2;">${f.name}</div>
+                        <div style="color:var(--text-muted); font-size:10px; margin-top:2px;">${f.buy}đ</div>
                     </div>
                 `;
             }).join('');
 
             document.getElementById('grid-days').innerHTML = Array.from({ length: 7 }).map((_, i) => `
-                <div class="day-box" id="day-${i+1}">Thứ ${i+2 === 8 ? 'CN' : i+2}</div>
+                <div class="day-box" id="day-${i+1}">T${i+2 === 8 ? 'CN' : i+2}</div>
             `).join('');
         }
         initApp();
 
-        // --- BẢO MẬT & QUẢN TRỊ ---
-        window.accessAdminPanel = function() {
-            const code = prompt("Vui lòng nhập mã bảo mật cấp quyền quản trị:");
-            if (code === "67890") {
+        window.verifyAdminPassword = function() {
+            const input = document.getElementById('admin-password-input');
+            if (input.value === "67890") {
+                closePopup('pop-auth');
                 openPopup('pop-admin-panel');
+                input.value = "";
             } else {
-                alert("Mã xác thực không hợp lệ.");
+                showToast("❌ Mã pin không đúng quyền truy cập!");
             }
         };
 
         window.switchAdminTab = function(type) {
             document.getElementById('admin-add-list').style.display = type === 'add' ? 'flex' : 'none';
             document.getElementById('admin-sub-list').style.display = type === 'sub' ? 'flex' : 'none';
-            document.getElementById('tab-add').style.color = type === 'add' ? 'var(--text-main)' : 'var(--text-muted)';
-            document.getElementById('tab-sub').style.color = type === 'sub' ? 'var(--text-main)' : 'var(--text-muted)';
+            document.getElementById('tab-add').classList.toggle('active', type === 'add');
+            document.getElementById('tab-sub').classList.toggle('active', type === 'sub');
         };
 
         window.openPopup = function(id) { document.getElementById(id).style.display = 'flex'; };
@@ -364,23 +401,24 @@
 
         window.modifyPoints = function(pts, text) {
             set(ref(db, 'score'), currentScore + pts);
-            push(ref(db, 'history'), `[${pts > 0 ? `+${pts}` : pts}đ] Cập nhật điều phối: ${text}`);
+            push(ref(db, 'history'), `[${pts > 0 ? `+${pts}` : pts}đ] QTV cập nhật: ${text}`);
+            showToast(`✅ Đã điều phối ${pts > 0 ? `+${pts}` : pts} điểm!`);
         };
 
         window.redeemGift = function(cost, giftName) {
             if (currentScore < cost) {
-                alert("Điểm số tích lũy hiện tại không đủ hành động.");
+                showToast("⚠️ Điểm số tích lũy hiện không đủ quy đổi!");
                 return;
             }
             set(ref(db, 'score'), currentScore - cost);
-            push(ref(db, 'history'), `[-${cost}đ] Đã thực hiện đổi: ${giftName}`);
-            alert("Đã đổi điểm thành công, hãy cap màn hình gửi cho người ấy nhé!");
+            push(ref(db, 'history'), `[-${cost}đ] Đã đổi quà tặng: ${giftName}`);
+            showToast("🎁 Đổi quà thành công! Hãy chụp màn hình gửi đi nhé.");
         };
 
         window.claimDailyAttendance = function() {
             const todayStr = new Date().toDateString();
             if (lastAttendanceDate === todayStr) {
-                alert("Hành động điểm danh hôm nay đã được thực hiện.");
+                showToast("✨ Bạn đã hoàn thành điểm danh hôm nay rồi.");
                 return;
             }
             lastAttendanceDate = todayStr;
@@ -391,8 +429,8 @@
             const dayIdx = (newStreak - 1) % 7 + 1;
             document.getElementById(`day-${dayIdx}`).classList.add('checked');
 
-            push(ref(db, 'history'), `[+5đ] Điểm danh hệ thống thành công (Chuỗi ${newStreak} ngày)`);
-            alert("Xác nhận điểm danh thành công! (+5đ)");
+            push(ref(db, 'history'), `[+5đ] Điểm danh hàng ngày (Chuỗi ${newStreak} ngày)`);
+            showToast("🌸 Điểm danh thành công! (+5đ)");
         };
 
         window.selectSeed = function(key) {
@@ -410,12 +448,12 @@
 
             if (!plot || plot.status === 'empty') {
                 if (!selectedSeedKey) {
-                    alert("Vui lòng chọn loại hạt giống ở thanh bên phải trước.");
+                    showToast("🌱 Hãy chọn 1 loại hạt giống ở thanh bên phải trước.");
                     return;
                 }
                 const flower = flowersCatalog[selectedSeedKey];
                 if (currentScore < flower.buy) {
-                    alert("Điểm tích lũy không đủ.");
+                    showToast("⚠️ Điểm số tích lũy không đủ mua hạt giống này.");
                     return;
                 }
 
@@ -426,7 +464,8 @@
                     timeEnd: Date.now() + (flower.time * 1000)
                 };
                 set(ref(db, 'plots'), localPlots);
-                push(ref(db, 'history'), `[-${flower.buy}đ] Gieo trồng hạt giống ${flower.name}`);
+                push(ref(db, 'history'), `[-${flower.buy}đ] Tiến hành trồng ${flower.name}`);
+                showToast(`🌱 Gieo hạt ${flower.name} thành công.`);
                 
                 selectedSeedKey = null;
                 document.querySelectorAll('.seed-item').forEach(el => el.classList.remove('selected'));
@@ -436,16 +475,16 @@
                     plot.status = 'harvest';
                     localPlots[index] = plot;
                     set(ref(db, 'plots'), localPlots);
-                    alert("Cây trồng đã trưởng thành. Nhấn lần nữa để thu hoạch.");
+                    showToast("🎉 Cây đã chín! Nhấn thêm lần nữa để gặt hái nào.");
                 } else {
-                    alert("Cây trồng đang trong giai đoạn phát triển.");
+                    showToast("⏳ Cây trồng đang hấp thu dưỡng chất để lớn...");
                 }
             } 
             else if (plot.status === 'harvest') {
                 const flower = flowersCatalog[plot.plantKey];
                 set(ref(db, 'score'), currentScore + flower.sell);
-                push(ref(db, 'history'), `[+${flower.sell}đ] Thu hoạch sản lượng từ ${flower.name}`);
-                alert(`Thu hoạch thành công! (+${flower.sell}đ)`);
+                push(ref(db, 'history'), `[+${flower.sell}đ] Thu hoạch nông sản ${flower.name}`);
+                showToast(`🧺 Thu hoạch hoàn tất! (+${flower.sell}đ)`);
 
                 localPlots[index] = { status: 'empty', plantKey: '', timeEnd: 0 };
                 set(ref(db, 'plots'), localPlots);
@@ -470,11 +509,12 @@
                         emojiEl.innerText = "🌱";
                         timerEl.style.display = 'block';
                         timerEl.innerText = `${timeLeft}s`;
+                        timerEl.style.background = "var(--text-main)";
                     } else {
                         emojiEl.innerText = flower.emoji;
                         timerEl.style.display = 'block';
                         timerEl.innerText = "Thu hoạch";
-                        timerEl.style.background = "#2e7d32";
+                        timerEl.style.background = "#2b2b2b";
                     }
                 }
             }
