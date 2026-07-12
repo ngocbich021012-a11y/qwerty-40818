@@ -3,368 +3,564 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Khu Vườn Tích Điểm</title>
+    <title>Khu Vườn Tình Yêu Của Hai Đứa</title>
+    <!-- Thêm thư viện nhạc nền FontAwesome và Google Fonts để tăng độ cute -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --bg-color: #ffeef2;
-            --card-bg: #ffffff;
-            --text-main: #6c4b5e;
-            --accent-pink: #ffb7c5;
-            --accent-soft: #ffcad4;
-            --btn-boy: #a8dadc;
-            --btn-girl: #ffb7b2;
-            --gold: #ffd166;
+            --bg-pastel: #fff0f3;
+            --pink-main: #ffb7c5;
+            --pink-dark: #ff758f;
+            --pink-light: #ffe5ec;
+            --text-color: #5c3d46;
+            --white: #ffffff;
+            --boy-color: #a8dadc;
+            --mint: #b7e4c7;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-main); padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        .container { width: 100%; max-width: 500px; background: var(--card-bg); padding: 25px; border-radius: 30px; box-shadow: 0 10px 30px rgba(255, 183, 197, 0.3); border: 4px solid #fff; }
-        h1 { text-align: center; font-size: 24px; margin-bottom: 20px; color: #ff758f; position: relative; }
-        .score-board { display: flex; justify-content: space-between; align-items: center; background: var(--bg-color); padding: 15px 20px; border-radius: 20px; margin-bottom: 25px; border: 2px dashed var(--accent-pink); }
-        .score-title { font-weight: bold; font-size: 16px; display: flex; align-items: center; gap: 5px; }
-        .score-val { font-size: 32px; font-weight: 900; color: #ff477e; text-shadow: 1px 1px #fff; }
+        body { background-color: var(--bg-pastel); color: var(--text-color); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 10px; overflow-x: hidden; }
         
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab-btn { flex: 1; padding: 12px; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; background: #eee; color: #777; transition: all 0.3s; }
-        .tab-btn.active { background: var(--accent-pink); color: #fff; box-shadow: 0 4px 10px rgba(255, 117, 143, 0.2); }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+        /* --- GIAO DIỆN LOADING CUTE --- */
+        #loading-screen { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--pink-light); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s ease; }
+        .loading-heart { font-size: 60px; color: var(--pink-dark); animation: beat 1s infinite alternate; }
+        .loading-text { margin-top: 20px; font-weight: bold; font-size: 18px; color: var(--pink-dark); letter-spacing: 2px; }
+        @keyframes beat { to { transform: scale(1.3); } }
 
-        .mission-group { display: flex; flex-direction: column; gap: 12px; }
-        .mission-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: #fffafb; border: 1px solid var(--accent-soft); border-radius: 15px; transition: transform 0.2s; }
-        .mission-item:hover { transform: translateY(-2px); }
-        .m-info { display: flex; flex-direction: column; gap: 2px; }
-        .m-title { font-weight: 600; font-size: 14px; }
-        .m-pts { font-size: 12px; color: #ff758f; font-weight: bold; }
-        .btn-action { padding: 8px 16px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; color: #fff; box-shadow: 0 3px 6px rgba(0,0,0,0.05); }
-        .btn-boy { background-color: var(--btn-boy); color: #3d5a80; }
-        .btn-girl { background-color: var(--btn-girl); color: #6d4c41; }
+        /* --- CONTAINER CHÍNH --- */
+        .app-container { width: 100%; max-width: 480px; background: var(--white); border-radius: 30px; box-shadow: 0 10px 30px rgba(255, 117, 143, 0.2); border: 5px solid var(--pink-light); padding: 20px; position: relative; display: none; }
+        
+        /* Nhạc nền điều khiển */
+        .music-ctrl { position: absolute; top: 15px; right: 15px; background: var(--pink-light); border: none; width: 35px; height: 35px; border-radius: 50%; color: var(--pink-dark); cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-        /* Vườn Cây */
-        .garden-desc { text-align: center; font-size: 13px; margin-bottom: 15px; color: #888; }
-        .garden-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
-        .plot { aspect-ratio: 1; background: #e0d0c0; border-radius: 15px; border: 3px solid #b09070; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; cursor: pointer; transition: all 0.2s; }
-        .plot:hover { background: #d0c0b0; }
-        .plot-plant { font-size: 36px; line-height: 1; z-index: 2; }
-        .plot-progress { position: absolute; bottom: 5px; left: 5px; right: 5px; height: 6px; background: rgba(0,0,0,0.1); border-radius: 3px; overflow: hidden; display: none; }
-        .plot-progress-bar { height: 100%; background: #4caf50; width: 0%; transition: width 0.5s; }
-        .seed-shop { display: flex; justify-content: center; gap: 15px; background: #fdf5f6; padding: 15px; border-radius: 20px; border: 1px solid var(--accent-soft); }
-        .seed-btn { display: flex; flex-direction: column; align-items: center; background: #fff; border: 2px solid var(--accent-soft); padding: 10px; border-radius: 15px; cursor: pointer; font-weight: bold; font-size: 13px; width: 80px; gap: 5px; }
-        .seed-btn:hover { border-color: var(--accent-pink); }
-        .seed-btn.selected { border-color: #ff477e; background: #fff0f3; }
+        h1 { text-align: center; font-size: 22px; color: var(--pink-dark); margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        
+        /* Bảng hiển thị điểm */
+        .score-box { background: var(--pink-light); padding: 15px; border-radius: 20px; text-align: center; margin-bottom: 20px; border: 2px dashed var(--pink-main); }
+        .score-num { font-size: 40px; font-weight: 900; color: var(--pink-dark); text-shadow: 2px 2px #fff; }
+        .streak-info { font-size: 13px; font-weight: bold; color: #666; margin-top: 5px; }
 
-        /* Cửa hàng quà tặng */
-        .shop-grid { display: flex; flex-direction: column; gap: 12px; }
-        .shop-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #fff; border: 2px solid #f0f0f0; border-radius: 18px; }
-        .shop-cost { font-size: 13px; color: #bcaaa4; font-weight: bold; margin-top: 2px; }
-        .btn-buy { background: var(--gold); color: #6c5c00; }
+        /* Chuyển đổi quyền Web */
+        .role-switcher { display: flex; background: #eee; border-radius: 12px; padding: 3px; margin-bottom: 15px; }
+        .role-btn { flex: 1; padding: 8px; border: none; background: transparent; cursor: pointer; border-radius: 10px; font-weight: bold; color: #777; transition: 0.3s; }
+        .role-btn.active { background: var(--pink-main); color: var(--white); }
 
-        /* Thông báo / Lịch sử */
-        .history-box { margin-top: 25px; border-top: 2px dashed var(--accent-soft); padding-top: 15px; }
-        .history-title { font-size: 14px; font-weight: bold; margin-bottom: 10px; color: #888; display: flex; align-items: center; gap: 5px; }
-        .history-list { max-height: 120px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
-        .history-item { padding: 6px 10px; background: #fdf8f9; border-radius: 8px; border-left: 3px solid var(--accent-pink); }
+        /* Giao diện các Tab phụ */
+        .main-menu { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
+        .menu-btn { background: var(--pink-light); border: none; padding: 10px; border-radius: 15px; font-weight: bold; color: var(--text-color); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 13px; }
+        .menu-btn:hover { background: var(--pink-main); color: white; }
+
+        .panel { display: none; }
+        .panel.active { display: block; }
+
+        /* --- STYLE CHO DANH SÁCH NHIỆM VỤ / CỦA HÀNG --- */
+        .list-group { display: flex; flex-direction: column; gap: 10px; max-height: 320px; overflow-y: auto; padding-right: 5px; }
+        .item-card { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #fffafb; border: 1px solid var(--pink-light); border-radius: 15px; }
+        .item-info { display: flex; flex-direction: column; gap: 2px; }
+        .item-title { font-weight: bold; font-size: 14px; }
+        .item-val { font-size: 12px; font-weight: bold; }
+        .val-plus { color: #4caf50; }
+        .val-minus { color: #e63946; }
+
+        .btn-action { padding: 6px 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; color: white; }
+        .btn-add { background: var(--pink-dark); }
+        .btn-buy { background: #ffca3a; color: #5c4d00; }
+
+        /* --- KHU VƯỜN TRỒNG CÂY (6 Ô + THANH PHẢI) --- */
+        .garden-layout { display: flex; gap: 10px; margin-top: 10px; }
+        .garden-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; flex: 1; }
+        .plot { aspect-ratio: 1; background: #e6ccb2; border: 3px solid #b18567; border-radius: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; cursor: pointer; }
+        .plot-emoji { font-size: 32px; z-index: 2; }
+        .plot-timer { font-size: 10px; background: rgba(0,0,0,0.5); color: white; padding: 2px 5px; border-radius: 8px; position: absolute; bottom: 5px; display: none; }
+        
+        .seed-sidebar { width: 95px; background: var(--pink-light); border-radius: 15px; padding: 8px; display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto; }
+        .seed-item { background: white; border: 2px solid transparent; border-radius: 10px; padding: 6px; display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: bold; cursor: grab; text-align: center; }
+        .seed-item.selected { border-color: var(--pink-dark); background: #fff0f3; }
+
+        /* --- POPUP / BẢNG ĐIỂM DANH TUẦN --- */
+        .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.4); z-index: 1000; display: none; justify-content: center; align-items: center; padding: 20px; }
+        .popup { background: white; border-radius: 25px; padding: 20px; width: 100%; max-width: 400px; position: relative; box-shadow: 0 5px 20px rgba(0,0,0,0.15); animation: popUp 0.3s ease; }
+        @keyframes popUp { from { transform: scale(0.8); opacity: 0; } }
+        .close-popup { position: absolute; top: 15px; right: 15px; font-size: 20px; cursor: pointer; color: #aaa; }
+        
+        .attendance-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px; }
+        .day-box { background: var(--pink-light); border-radius: 12px; padding: 10px 5px; text-align: center; font-size: 12px; font-weight: bold; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .day-box.checked { background: var(--mint); color: #2d6a4f; }
+
+        /* Nhật ký biến động điểm */
+        .history-box { margin-top: 15px; background: #fafafa; border-radius: 15px; padding: 10px; border: 1px solid #eee; }
+        .history-title { font-size: 13px; font-weight: bold; color: #888; margin-bottom: 5px; }
+        .history-list { max-height: 100px; overflow-y: auto; display: flex; flex-direction: column; gap: 5px; font-size: 12px; }
+        .history-item { padding: 5px 8px; background: #fff; border-radius: 6px; border-left: 3px solid var(--pink-main); }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1> Vườn Điểm</h1>
-
-    <!-- Bảng Điểm Chung -->
-    <div class="score-board">
-        <div class="score-title">✨ Điểm Tích Lũy Chung:</div>
-        <div class="score-val" id="total-score">0</div>
+    <!-- 1. MÀN HÌNH LOADING CUTE -->
+    <div id="loading-screen">
+        <div class="loading-heart"><i class="fas fa-heart"></i></div>
+        <div class="loading-text">ĐANG TẢI VƯỜN YÊU...</div>
     </div>
 
-    <!-- Thanh Tabs điều hướng -->
-    <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('tab-mission')">📋 Nhiệm Vụ</button>
-        <button class="tab-btn" onclick="switchTab('tab-garden')">🌱 Khu Vườn</button>
-        <button class="tab-btn" onclick="switchTab('tab-shop')">🎁 Đổi Quà</button>
-    </div>
+    <!-- 2. GIAO DIỆN CHÍNH CỦA ỨNG DỤNG -->
+    <div class="app-container" id="main-app">
+        <!-- Nút bật/tắt nhạc dễ thương -->
+        <button class="music-ctrl" onclick="toggleMusic()"><i id="music-icon" class="fas fa-music"></i></button>
+        <audio id="bg-audio" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
 
-    <!-- TAB 1: NHIỆM VỤ -->
-    <div id="tab-mission" class="tab-content active">
-        <div class="mission-group">
-            <div class="mission-item">
-                <div class="m-info"><span class="m-title">☀️ Điểm danh ngày mới</span><span class="m-pts">+10 điểm</span></div>
-                <div>
-                    <button class="btn-action btn-boy" onclick="addPoints(10, 'Bạn nam điểm danh ngày mới ☀️')">Nam</button>
-                    <button class="btn-action btn-girl" onclick="addPoints(10, 'Bạn nữ điểm danh ngày mới ☀️')">Nữ</button>
-                </div>
+        <h1><i class="fas fa-sparkles"></i> Vườn Tình Yêu <i class="fas fa-sparkles"></i></h1>
+
+        <!-- BẢNG ĐIỂM CHUNG -->
+        <div class="score-box">
+            <div style="font-weight: bold; font-size: 14px; color: #888;">Điểm tích lũy hiện tại</div>
+            <div class="score-num" id="total-score">0</div>
+            <div class="streak-info" id="streak-text">🔥 Chuỗi đăng nhập ngày: 0 ngày</div>
+        </div>
+
+        <!-- THANH CHUYỂN WEB NAM VÀ NỮ -->
+        <div class="role-switcher">
+            <button class="role-btn active" id="btn-role-girl" onclick="switchRole('girl')">Web Bạn Nữ 👩‍🦰</button>
+            <button class="role-btn" id="btn-role-boy" onclick="switchRole('boy')">Web Bạn Nam (Tôi) 👨‍💻</button>
+        </div>
+
+        <!-- ================= MÀN HÌNH BẠN NỮ ================= -->
+        <div id="panel-girl" class="panel active">
+            <div class="main-menu">
+                <button class="menu-btn" onclick="openPopup('pop-attendance')"><i class="fas fa-calendar-check" style="color: #4caf50;"></i>Điểm Danh</button>
+                <button class="menu-btn" onclick="openPopup('pop-garden')"><i class="fas fa-seedling" style="color: #2a9d8f;"></i>Trồng Cây</button>
+                <button class="menu-btn" onclick="openPopup('pop-shop')"><i class="fas fa-gift" style="color: #ffb703;"></i>Đổi Quà</button>
             </div>
-            <div class="mission-item">
-                <div class="m-info"><span class="m-title">🥛 Uống đủ nước hôm nay</span><span class="m-pts">+5 điểm</span></div>
-                <div>
-                    <button class="btn-action btn-boy" onclick="addPoints(5, 'Bạn nam uống đủ nước 🥛')">Nam</button>
-                    <button class="btn-action btn-girl" onclick="addPoints(5, 'Bạn nữ uống đủ nước 🥛')">Nữ</button>
-                </div>
+        </div>
+
+        <!-- ================= MÀN HÌNH BẠN NAM (BẢNG ĐIỀU KHIỂN) ================= -->
+        <div id="panel-boy" class="panel">
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <button class="tab-btn role-btn active" style="flex:1; padding: 5px;" onclick="switchAdminTab('add')">Cộng Điểm 👍</button>
+                <button class="tab-btn role-btn" style="flex:1; padding: 5px;" onclick="switchAdminTab('sub')">Trừ Điểm 👎</button>
             </div>
-            <div class="mission-item">
-                <div class="m-info"><span class="m-title">🍚 Ăn uống đúng giờ</span><span class="m-pts">+15 điểm</span></div>
-                <div>
-                    <button class="btn-action btn-boy" onclick="addPoints(15, 'Bạn nam ăn uống đúng giờ 🍚')">Nam</button>
-                    <button class="btn-action btn-girl" onclick="addPoints(15, 'Bạn nữ ăn uống đúng giờ 🍚')">Nữ</button>
-                </div>
+
+            <!-- Tab Bảng Cộng Điểm -->
+            <div id="admin-add" class="admin-tab-content">
+                <div class="list-group" id="list-plus-actions"></div>
             </div>
-            <div class="mission-item">
-                <div class="m-info"><span class="m-title">🌙 Đi ngủ trước 23h</span><span class="m-pts">+20 điểm</span></div>
-                <div>
-                    <button class="btn-action btn-boy" onclick="addPoints(20, 'Bạn nam đi ngủ sớm 🌙')">Nam</button>
-                    <button class="btn-action btn-girl" onclick="addPoints(20, 'Bạn nữ đi ngủ sớm 🌙')">Nữ</button>
-                </div>
+
+            <!-- Tab Bảng Trừ Điểm -->
+            <div id="admin-sub" class="admin-tab-content" style="display: none;">
+                <div class="list-group" id="list-minus-actions"></div>
             </div>
-            <div class="mission-item">
-                <div class="m-info"><span class="m-title">🥰 Làm người kia vui lòng</span><span class="m-pts">+30 điểm</span></div>
-                <div>
-                    <button class="btn-action btn-boy" onclick="addPoints(30, 'Bạn nam làm người yêu vui 🥰')">Nam</button>
-                    <button class="btn-action btn-girl" onclick="addPoints(30, 'Bạn nữ làm người yêu vui 🥰')">Nữ</button>
-                </div>
+        </div>
+
+        <!-- NHẬT KÝ BIẾN ĐỘNG ĐIỂM CHUNG -->
+        <div class="history-box">
+            <div class="history-title"><i class="fas fa-history"></i> Nhật ký hoạt động ngọt ngào:</div>
+            <div class="history-list" id="history-logs">
+                <div class="history-item">Hệ thống đang kết nối...</div>
             </div>
         </div>
     </div>
 
-    <!-- TAB 2: KHU VƯỜN -->
-    <div id="tab-garden" class="tab-content">
-        <p class="garden-desc">Dùng điểm mua hạt giống, trồng vào ô đất và đợi hoa nở để nhận quà siêu lớn!</p>
-        <div class="garden-grid">
-            <div class="plot" onclick="clickPlot(0)"><span class="plot-plant" id="plant-0">🤎</span><div class="plot-progress"><div class="plot-progress-bar" id="bar-0"></div></div></div>
-            <div class="plot" onclick="clickPlot(1)"><span class="plot-plant" id="plant-1">🤎</span><div class="plot-progress"><div class="plot-progress-bar" id="bar-1"></div></div></div>
-            <div class="plot" onclick="clickPlot(2)"><span class="plot-plant" id="plant-2">🤎</span><div class="plot-progress"><div class="plot-progress-bar" id="bar-2"></div></div></div>
-            <div class="plot" onclick="clickPlot(3)"><span class="plot-plant" id="plant-3">🤎</span><div class="plot-progress"><div class="plot-progress-bar" id="bar-3"></div></div></div>
-            <div class="plot" onclick="clickPlot(4)"><span class="plot-plant" id="plant-4">🤎</span><div class="plot-progress"><div class="plot-progress-bar" id="bar-4"></div></div></div>
-            <div class="plot" onclick="clickPlot(5)"><span class="plot-plant" id="plant-5">🤎</span><div class="plot-progress"><div class="plot-progress-bar" id="bar-5"></div></div></div>
-        </div>
-        <div class="seed-shop">
-            <button class="seed-btn" id="seed-rose" onclick="selectSeed('rose', 30)">🌹<span>30đ</span></button>
-            <button class="seed-btn" id="seed-sunflower" onclick="selectSeed('sunflower', 50)">🌻<span>50đ</span></button>
-            <button class="seed-btn" id="seed-tree" onclick="selectSeed('tree', 100)">🌲<span>100đ</span></button>
-        </div>
-    </div>
+    <!-- ================= HỆ THỐNG POPUP NỔI (OVERLAYS) ================= -->
 
-    <!-- TAB 3: ĐỔI QUÀ -->
-    <div id="tab-shop" class="tab-content">
-        <div class="shop-grid">
-            <div class="shop-item">
-                <div><div style="font-weight: 600;">🥤 Một ly trà sữa size L</div><div class="shop-cost">Giá: 150 điểm</div></div>
-                <button class="btn-action btn-buy" onclick="buyGift(150, 'Đổi 1 ly trà sữa thơm ngon 🥤')">Đổi quà</button>
-            </div>
-            <div class="shop-item">
-                <div><div style="font-weight: 600;">🍿 Một buổi đi xem phim cùng nhau</div><div class="shop-cost">Giá: 300 điểm</div></div>
-                <button class="btn-action btn-buy" onclick="buyGift(300, 'Đổi 1 buổi xem phim lãng mạn 🍿')">Đổi quà</button>
-            </div>
-            <div class="shop-item">
-                <div><div style="font-weight: 600;">🧸 Một cái ôm thật ấm áp</div><div class="shop-cost">Giá: 50 điểm</div></div>
-                <button class="btn-action btn-buy" onclick="buyGift(50, 'Đổi một cái ôm ấm áp 🧸')">Đổi quà</button>
-            </div>
-            <div class="shop-item">
-                <div><div style="font-weight: 600;">❌ 1 lần tha thứ lỗi lầm</div><div class="shop-cost">Giá: 200 điểm</div></div>
-                <button class="btn-action btn-buy" onclick="buyGift(200, 'Đổi 1 thẻ miễn tội tha thứ lỗi lầm ❌')">Đổi quà</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Lịch sử hoạt động -->
-    <div class="history-box">
-        <div class="history-title">⏱️ Nhật ký ngọt ngào mới nhất:</div>
-        <div class="history-list" id="history-content">
-            <div class="history-item">Hệ thống đã kết nối sẵn sàng...</div>
-        </div>
-    </div>
-</div>
-
-<!-- KẾT NỐI SỢI DÂY LIÊN KẾT ĐẾN FIREBASE CỦA BẠN (QWERTY) -->
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue, set, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
-    // Đoạn cấu hình chuẩn của riêng bạn:
-    const firebaseConfig = {
-        apiKey: "AIzaSyCJip89os02VXHsbdFoad3o_S7QpX0ce6Y",
-        databaseURL: "https://qwerty-40818-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "qwerty-40818"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-
-    // Biến toàn cục cục bộ để theo dõi trạng thái
-    let currentScore = 0;
-    let selectedSeedType = null;
-    let selectedSeedCost = 0;
-    let localPlots = [
-        {status: 'empty', type: '', stage: 0, timeStarted: 0},
-        {status: 'empty', type: '', stage: 0, timeStarted: 0},
-        {status: 'empty', type: '', stage: 0, timeStarted: 0},
-        {status: 'empty', type: '', stage: 0, timeStarted: 0},
-        {status: 'empty', type: '', stage: 0, timeStarted: 0},
-        {status: 'empty', type: '', stage: 0, timeStarted: 0}
-    ];
-
-    // Lắng nghe dữ liệu Điểm số từ Firebase truyền về máy
-    onValue(ref(db, 'score'), (snapshot) => {
-        currentScore = snapshot.val() || 0;
-        document.getElementById('total-score').innerText = currentScore;
-    });
-
-    // Lắng nghe dữ liệu Nhật ký từ Firebase
-    onValue(ref(db, 'history'), (snapshot) => {
-        const list = document.getElementById('history-content');
-        list.innerHTML = "";
-        const data = snapshot.val();
-        if (data) {
-            const arr = Object.values(data).reverse(); // Hiện tin mới lên trên đầu
-            arr.slice(0, 15).forEach(msg => {
-                const item = document.createElement('div');
-                item.className = 'history-item';
-                item.innerText = msg;
-                list.appendChild(item);
-            });
-        } else {
-            list.innerHTML = `<div class="history-item">Chưa có hoạt động nào được ghi lại.</div>`;
-        }
-    });
-
-    // Lắng nghe dữ liệu các ô đất của Khu Vườn
-    onValue(ref(db, 'plots'), (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-            localPlots = data;
-        }
-        updateGardenUI();
-    });
-
-    // Hàm chuyển đổi Tab qua lại
-    window.switchTab = function(tabId) {
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        event.currentTarget.classList.add('active');
-    };
-
-    // Hàm cộng điểm nhiệm vụ
-    window.addPoints = function(pts, actionText) {
-        const newScore = currentScore + pts;
-        set(ref(db, 'score'), newScore);
-        push(ref(db, 'history'), `[+${pts}đ] ${actionText}`);
-    };
-
-    // Hàm đổi quà tặng trong shop
-    window.buyGift = function(cost, giftText) {
-        if (currentScore < cost) {
-            alert("Bạn không đủ điểm rồi, hãy chăm chỉ làm thêm nhiệm vụ nhé! 💪");
-            return;
-        }
-        const newScore = currentScore - cost;
-        set(ref(db, 'score'), newScore);
-        push(ref(db, 'history'), `[-${cost}đ] Người ấy đã đổi quà: ${giftText} 🎉`);
-        alert("Đổi quà thành công! Mau gửi ảnh màn hình cho người ấy để nhận quà nha 💖");
-    };
-
-    // Hàm chọn loại hạt giống
-    window.selectSeed = function(seedType, cost) {
-        document.querySelectorAll('.seed-btn').forEach(b => b.classList.remove('selected'));
-        if (selectedSeedType === seedType) {
-            selectedSeedType = null;
-            selectedSeedCost = 0;
-        } else {
-            selectedSeedType = seedType;
-            selectedSeedCost = cost;
-            document.getElementById(`seed-${seedType}`).classList.add('selected');
-        }
-    };
-
-    // Xử lý khi nhấn chuột vào ô đất trống hoặc cây trồng
-    window.clickPlot = function(index) {
-        let plot = localPlots[index] || {status: 'empty', type: '', stage: 0};
-        
-        if (plot.status === 'empty') {
-            if (!selectedSeedType) {
-                alert("Vui lòng chọn một loại hạt giống ở phía dưới trước khi gieo nha!");
-                return;
-            }
-            if (currentScore < selectedSeedCost) {
-                alert("Bạn không đủ điểm để mua hạt giống này rồi!");
-                return;
-            }
+    <!-- POPUP 1: ĐIỂM DANH TUẦN -->
+    <div class="overlay" id="pop-attendance">
+        <div class="popup">
+            <i class="fas fa-times close-popup" onclick="closePopup('pop-attendance')"></i>
+            <h3 style="text-align: center; color: var(--pink-dark);"><i class="fas fa-calendar-alt"></i> Điểm Danh Hàng Tuần</h3>
+            <p style="font-size: 12px; color: #777; text-align: center; margin-top: 5px;">Mỗi ngày nhận +5 Điểm & 1 Hạt Giống ngẫu nhiên!</p>
             
-            // Trừ điểm mua hạt giống và tiến hành trồng cây
-            const newScore = currentScore - selectedSeedCost;
-            set(ref(db, 'score'), newScore);
+            <div class="attendance-grid" id="grid-days"></div>
             
-            plot = {
-                status: 'growing',
-                type: selectedSeedType,
-                stage: 1,
-                timeStarted: Date.now()
-            };
-            localPlots[index] = plot;
-            set(ref(db, 'plots'), localPlots);
-            push(ref(db, 'history'), `[-${selectedSeedCost}đ] Đã mua hạt giống và gieo mầm cây mới 🌱`);
+            <button class="btn-action btn-add" style="width: 100%; margin-top: 20px; padding: 12px;" onclick="claimDailyAttendance()">BẤM ĐIỂM DANH HÔM NAY</button>
+        </div>
+    </div>
+
+    <!-- POPUP 2: KHU VƯỜN 6 Ô ĐẤT & HẠT GIỐNG CHỢ HOA -->
+    <div class="overlay" id="pop-garden">
+        <div class="popup" style="max-width: 440px; padding: 15px;">
+            <i class="fas fa-times close-popup" onclick="closePopup('pop-garden')"></i>
+            <h3 style="text-align: center; color: var(--pink-dark); margin-bottom: 10px;"><i class="fas fa-seedling"></i> Khu Vườn Hoa Của Bé</h3>
             
-            // Bỏ chọn hạt giống sau khi đã gieo xong
-            document.querySelectorAll('.seed-btn').forEach(b => b.classList.remove('selected'));
-            selectedSeedType = null;
-            selectedSeedCost = 0;
-        } 
-        else if (plot.status === 'growing') {
-            if (plot.stage < 3) {
-                plot.stage += 1;
-                localPlots[index] = plot;
-                set(ref(db, 'plots'), localPlots);
-                push(ref(db, 'history'), `💦 Tưới nước giúp cây ở ô đất số ${index + 1} lớn thêm một chút!`);
+            <div class="garden-layout">
+                <!-- 6 ô đất bên trái -->
+                <div class="garden-grid">
+                    <div class="plot" onclick="clickPlot(0)"><span class="plot-emoji" id="p-emoji-0">🟫</span><div class="plot-timer" id="p-time-0"></div></div>
+                    <div class="plot" onclick="clickPlot(1)"><span class="plot-emoji" id="p-emoji-1">🟫</span><div class="plot-timer" id="p-time-1"></div></div>
+                    <div class="plot" onclick="clickPlot(2)"><span class="plot-emoji" id="p-emoji-2">🟫</span><div class="plot-timer" id="p-time-2"></div></div>
+                    <div class="plot" onclick="clickPlot(3)"><span class="plot-emoji" id="p-emoji-3">🟫</span><div class="plot-timer" id="p-time-3"></div></div>
+                    <div class="plot" onclick="clickPlot(4)"><span class="plot-emoji" id="p-emoji-4">🟫</span><div class="plot-timer" id="p-time-4"></div></div>
+                    <div class="plot" onclick="clickPlot(5)"><span class="plot-emoji" id="p-emoji-5">🟫</span><div class="plot-timer" id="p-time-5"></div></div>
+                </div>
+
+                <!-- Thanh chứa hạt giống bên phải -->
+                <div class="seed-sidebar" id="sidebar-seeds"></div>
+            </div>
+            <p style="font-size: 11px; color: #888; text-align: center; margin-top: 10px;">Click chọn hạt giống bên phải ➔ Click ô đất trống để gieo hạt nha!</p>
+        </div>
+    </div>
+
+    <!-- POPUP 3: CỬA HÀNG ĐỔI QUÀ -->
+    <div class="overlay" id="pop-shop">
+        <div class="popup">
+            <i class="fas fa-times close-popup" onclick="closePopup('pop-shop')"></i>
+            <h3 style="text-align: center; color: var(--pink-dark); margin-bottom: 15px;"><i class="fas fa-store"></i> Tiệm Đổi Quà Tặng</h3>
+            <div class="list-group" id="list-shop-items"></div>
+        </div>
+    </div>
+
+
+    <!-- ================= XỬ LÝ DỮ LIỆU ĐỒNG BỘ QUA FIREBASE ================= -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue, set, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // Khởi tạo Firebase cấu hình theo tên ứng dụng của bạn
+        const firebaseConfig = {
+            apiKey: "AIzaSyCJip89os02VXHsbdFoad3o_S7QpX0ce6Y",
+            databaseURL: "https://qwerty-40818-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "qwerty-40818"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // --- CƠ SỞ DỮ LIỆU CẤU HÌNH ĐIỂM + CỬA HÀNG THEO YÊU CẦU ---
+        const plusMissions = [
+            { text: "Chúc buổi sáng/ buổi tối", pts: 10 },
+            { text: "Ăn đủ 3 bữa", pts: 10 },
+            { text: "Nghe lời", pts: 5 },
+            { text: "Ngoan", pts: 5 },
+            { text: "Ngày không bị trừ điểm nào", pts: 30 },
+            { text: "Tinh tế", pts: 5 },
+            { text: "Nói yêu tuôi (Giới hạn 1 lần/ngày)", pts: 10 },
+            { text: "Khi giận mà nhắn tin", pts: 5, desc: "1 tin nhắn" },
+            { text: "Gửi ảnh hàng ngày", pts: 5, desc: "1 ảnh" },
+            { text: "Gửi video tiktok", pts: 0.1, desc: "1 video" },
+            { text: "Gửi ảnh bụng >>", pts: 30 }
+        ];
+
+        const minusMissions = [
+            { text: "Nói dối", pts: -50 },
+            { text: "Làm bực", pts: -20 },
+            { text: "Không nghe lời", pts: -10 },
+            { text: "Tim ảnh gái", pts: -20 },
+            { text: "Ngủ muộn", pts: -50 },
+            { text: "Thái độ", pts: -10 },
+            { text: "Làm khó chịu", pts: -20 },
+            { text: "Đang giận mà không nhắn", pts: -100 },
+            { text: "Làm tuôi giận", pts: -100 }
+        ];
+
+        const shopGifts = [
+            { text: "Thẻ miễn trừ tội lầm", cost: 5000 },
+            { text: "Thẻ giảm nhẹ tội lầm", cost: 2000 },
+            { text: "Thẻ x2 điểm trong 24 giờ", cost: 3500 },
+            { text: "Đổi 1 tấm ảnh bí mật", cost: 50000 },
+            { text: "Đổi 1 tin nhắn thoại Voice", cost: 100000 },
+            { text: "Thẻ nói thật (Bắt buộc trả lời)", cost: 5000 },
+            { text: "Thẻ yêu cầu làm việc gì đó", cost: 200000 }
+        ];
+
+        // Dữ liệu 6 loại hoa theo yêu cầu (Thời gian tính bằng giây để test nhanh)
+        const flowersCatalog = {
+            rose: { name: "Hoa Hồng", buy: 5, sell: 10, time: 10, emoji: "🌹" }, 
+            sunflower: { name: "Hướng Dương", buy: 10, sell: 20, time: 20, emoji: "🌻" },
+            tulip: { name: "Hoa Tulip", buy: 20, sell: 45, time: 40, emoji: "🌷" },
+            lavender: { name: "Oải Hương", buy: 50, sell: 120, time: 60, emoji: "🪻" },
+            cherry: { name: "Anh Đào", buy: 100, sell: 260, time: 90, emoji: "🌸" },
+            lotus: { name: "Hoa Sen", buy: 200, sell: 550, time: 120, emoji: "🪷" }
+        };
+
+        // Biến cục bộ
+        let currentScore = 0;
+        let selectedSeedKey = null;
+        let currentStreak = 0;
+        let lastAttendanceDate = "";
+        let localPlots = Array(6).fill({ status: 'empty', plantKey: '', timeEnd: 0, stage: 1 });
+        let currentActiveRole = 'girl'; // Mặc định khi mở lên là màn hình bạn Nữ
+
+        // --- ⏳ ĐỢI HIỆU ỨNG LOADING CUTE ---
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loading-screen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loading-screen').style.display = 'none';
+                    document.getElementById('main-app').style.display = 'block';
+                }, 500);
+            }, 1500);
+        });
+
+        // --- ĐỒNG BỘ DỮ LIỆU TỪ FIREBASE REALTIME ---
+        onValue(ref(db, 'score'), (snapshot) => {
+            currentScore = snapshot.val() || 0;
+            document.getElementById('total-score').innerText = formatScore(currentScore);
+        });
+
+        onValue(ref(db, 'streak'), (snapshot) => {
+            currentStreak = snapshot.val() || 0;
+            document.getElementById('streak-text').innerText = `🔥 Chuỗi đăng nhập ngày: ${currentStreak} ngày`;
+        });
+
+        onValue(ref(db, 'history'), (snapshot) => {
+            const logBox = document.getElementById('history-logs');
+            logBox.innerHTML = "";
+            const data = snapshot.val();
+            if (data) {
+                Object.values(data).reverse().slice(0, 15).forEach(log => {
+                    const div = document.createElement('div');
+                    div.className = 'history-item';
+                    div.innerText = log;
+                    logBox.appendChild(div);
+                });
             } else {
-                plot.status = 'harvest';
+                logBox.innerHTML = '<div class="history-item">Chưa có lịch sử hoạt động nào.</div>';
+            }
+        });
+
+        onValue(ref(db, 'plots'), (snapshot) => {
+            const data = snapshot.val();
+            if (data) localPlots = data;
+            renderGardenGrid();
+        });
+
+        function formatScore(num) {
+            return Number(num).toFixed(1).replace('.0', '');
+        }
+
+        // --- KHỞI TẠO DANH SÁCH GIAO DIỆN ---
+        function initAppLists() {
+            const plusContainer = document.getElementById('list-plus-actions');
+            plusContainer.innerHTML = plusMissions.map((m, idx) => `
+                <div class="item-card">
+                    <div class="item-info">
+                        <span class="item-title">${m.text}</span>
+                        <span class="item-val val-plus">+${m.pts}đ ${m.desc ? `(${m.desc})` : ''}</span>
+                    </div>
+                    <button class="btn-action btn-add" onclick="modifyPoints(${m.pts}, '${m.text}')">Cộng</button>
+                </div>
+            `).join('');
+
+            const minusContainer = document.getElementById('list-minus-actions');
+            minusContainer.innerHTML = minusMissions.map((m, idx) => `
+                <div class="item-card">
+                    <div class="item-info">
+                        <span class="item-title">${m.text}</span>
+                        <span class="item-val val-minus">${m.pts}đ</span>
+                    </div>
+                    <button class="btn-action btn-buy" style="background:#e63946; color:white;" onclick="modifyPoints(${m.pts}, '${m.text}')">Trừ</button>
+                </div>
+            `).join('');
+
+            const shopContainer = document.getElementById('list-shop-items');
+            shopContainer.innerHTML = shopGifts.map((g, idx) => `
+                <div class="item-card">
+                    <div class="item-info">
+                        <span class="item-title">${g.text}</span>
+                        <span class="item-val" style="color:#f4a261;">Giá: ${g.cost} điểm</span>
+                    </div>
+                    <button class="btn-action btn-buy" onclick="redeemGift(${g.cost}, '${g.text}')">Đỏi</button>
+                </div>
+            `).join('');
+
+            const sidebar = document.getElementById('sidebar-seeds');
+            sidebar.innerHTML = Object.keys(flowersCatalog).map(key => {
+                const f = flowersCatalog[key];
+                return `
+                    <div class="seed-item" id="seed-${key}" onclick="selectSeed('${key}')">
+                        <span style="font-size:20px;">${f.emoji}</span>
+                        <div style="margin-top:2px;">${f.name}</div>
+                        <div style="color:var(--pink-dark); font-size:10px;">Mua: ${f.buy}đ</div>
+                    </div>
+                `;
+            }).join('');
+
+            const gridDays = document.getElementById('grid-days');
+            gridDays.innerHTML = Array.from({ length: 7 }).map((_, i) => `
+                <div class="day-box" id="day-${i+1}">
+                    <span>Thứ ${i+2 === 8 ? 'CN' : i+2}</span>
+                    <span style="font-size:16px;">🎁</span>
+                </div>
+            `).join('');
+        }
+        initAppLists();
+
+        // --- CÁC HÀM XỬ LÝ CHỨC NĂNG CÓ MẬT KHẨU ---
+        window.switchRole = function(role) {
+            // Nếu bấm chọn sang tab Nữ, bắt buộc hỏi mật khẩu bảo mật
+            if (role === 'girl') {
+                const passwordInput = prompt("Vui lòng nhập mật khẩu Web Bạn Nữ để tiếp tục:");
+                if (passwordInput !== "67890") {
+                    alert("Mật khẩu sai rồi! Bạn không có quyền truy cập vào khu vườn của Nữ đâu nha 🤫");
+                    // Giữ nguyên trạng thái ở tab Nam, không cho chuyển
+                    document.getElementById('btn-role-girl').classList.remove('active');
+                    document.getElementById('btn-role-boy').classList.add('active');
+                    document.getElementById('panel-girl').classList.remove('active');
+                    document.getElementById('panel-boy').classList.add('active');
+                    return;
+                }
+            }
+
+            // Nếu nhập đúng mật khẩu hoặc chuyển sang tab Nam thì xử lý bình thường
+            currentActiveRole = role;
+            document.getElementById('btn-role-girl').classList.toggle('active', role === 'girl');
+            document.getElementById('btn-role-boy').classList.toggle('active', role === 'boy');
+            document.getElementById('panel-girl').classList.toggle('active', role === 'girl');
+            document.getElementById('panel-boy').classList.toggle('active', role === 'boy');
+        };
+
+        window.switchAdminTab = function(type) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            document.getElementById('admin-add').style.display = type === 'add' ? 'block' : 'none';
+            document.getElementById('admin-sub').style.display = type === 'sub' ? 'block' : 'none';
+        };
+
+        window.openPopup = function(id) { document.getElementById(id).style.display = 'flex'; };
+        window.closePopup = function(id) { document.getElementById(id).style.display = 'none'; };
+
+        window.modifyPoints = function(pts, text) {
+            const targetScore = currentScore + pts;
+            set(ref(db, 'score'), targetScore);
+            const symbol = pts > 0 ? `+${pts}` : `${pts}`;
+            push(ref(db, 'history'), `[${symbol}đ] Bạn Nam cập nhật: ${text}`);
+        };
+
+        window.redeemGift = function(cost, giftName) {
+            if (currentScore < cost) {
+                alert("Úi! Số điểm tích lũy hiện tại không đủ để đổi món quà này rồi, tích thêm nha bé! 💖");
+                return;
+            }
+            const targetScore = currentScore - cost;
+            set(ref(db, 'score'), targetScore);
+            push(ref(db, 'history'), `[-${cost}đ] Bạn Nữ đã đổi quà: ${giftName}`);
+            alert("Đã đổi điểm thành công, hãy cap màn hình gửi cho người ấy nhé! ✨");
+        };
+
+        window.claimDailyAttendance = function() {
+            const todayStr = new Date().toDateString();
+            if (lastAttendanceDate === todayStr) {
+                alert("Hôm nay bạn đã điểm danh rồi, hãy quay lại vào ngày mai nhé! 🥰");
+                return;
+            }
+            lastAttendanceDate = todayStr;
+            const newStreak = currentStreak + 1;
+            set(ref(db, 'streak'), newStreak);
+            
+            const targetScore = currentScore + 5;
+            set(ref(db, 'score'), targetScore);
+            
+            const currentDayIndex = (newStreak - 1) % 7 + 1;
+            document.getElementById(`day-${currentDayIndex}`).classList.add('checked');
+            document.getElementById(`day-${currentDayIndex}`).innerHTML += `<span style="font-size:10px; color:green;">✔️ Xong</span>`;
+
+            push(ref(db, 'history'), `[+5đ] Bạn Nữ điểm danh hàng ngày thành công! (Chuỗi ${newStreak} ngày) ☀️`);
+            alert(`Điểm danh thành công! Nhận được +5 Điểm thưởng và Gieo mầm năng lượng mới! 🎉`);
+        };
+
+        window.selectSeed = function(key) {
+            document.querySelectorAll('.seed-item').forEach(el => el.classList.remove('selected'));
+            if (selectedSeedKey === key) {
+                selectedSeedKey = null;
+            } else {
+                selectedSeedKey = key;
+                document.getElementById(`seed-${key}`).classList.add('selected');
+            }
+        };
+
+        window.clickPlot = function(index) {
+            let plot = localPlots[index];
+
+            if (plot.status === 'empty') {
+                if (!selectedSeedKey) {
+                    alert("Hãy nhấn chọn 1 loại hạt giống ở thanh dọc bên phải trước khi gieo nha!");
+                    return;
+                }
+                const flower = flowersCatalog[selectedSeedKey];
+                if (currentScore < flower.buy) {
+                    alert("Số điểm của bạn không đủ để mua hạt giống hoa này rồi!");
+                    return;
+                }
+
+                const targetScore = currentScore - flower.buy;
+                set(ref(db, 'score'), targetScore);
+
+                plot = {
+                    status: 'growing',
+                    plantKey: selectedSeedKey,
+                    timeEnd: Date.now() + (flower.time * 1000),
+                    stage: 1
+                };
                 localPlots[index] = plot;
                 set(ref(db, 'plots'), localPlots);
-            }
-        } 
-        else if (plot.status === 'harvest') {
-            let bonus = 40;
-            if (plot.type === 'sunflower') bonus = 70;
-            if (plot.type === 'tree') bonus = 150;
-            
-            const newScore = currentScore + bonus;
-            set(ref(db, 'score'), newScore);
-            
-            plot = {status: 'empty', type: '', stage: 0, timeStarted: 0};
-            localPlots[index] = plot;
-            set(ref(db, 'plots'), localPlots);
-            push(ref(db, 'history'), `🎁 Thu hoạch cây thành công! Nhận về phần thưởng siêu to khổng lồ: +${bonus} điểm thưởng!`);
-            alert(`🎉 Chúc mừng bạn đã thu hoạch cây thành công và nhận thêm +${bonus} điểm thưởng ngọt ngào!`);
-        }
-    };
-
-    // Hàm cập nhật trạng thái hiển thị của các ô đất sang hình vẽ Emoji tương ứng
-    function updateGardenUI() {
-        for (let i = 0; i < 6; i++) {
-            const plot = localPlots[i] || {status: 'empty', type: '', stage: 0};
-            const plantEl = document.getElementById(`plant-${i}`);
-            const barContainer = plantEl.nextElementSibling;
-            const barEl = document.getElementById(`bar-${i}`);
-            
-            if (plot.status === 'empty') {
-                plantEl.innerText = "棕"; // Hình biểu tượng ô đất nâu trống
-                barContainer.style.display = "none";
-            } 
-            else if (plot.status === 'growing' || plot.status === 'harvest') {
-                barContainer.style.display = "block";
-                let percent = (plot.stage / 3) * 100;
-                barEl.style.width = `${percent}%`;
+                push(ref(db, 'history'), `[-${flower.buy}đ] Gieo mầm hạt giống hạt ${flower.name} vào ô đất số ${index + 1} 🌱`);
                 
-                if (plot.stage === 1) plantEl.innerText = "🌱";
-                else if (plot.stage === 2) plantEl.innerText = "🌿";
-                else if (plot.stage === 3) {
-                    barEl.style.width = `100%`;
-                    if (plot.type === 'rose') plantEl.innerText = "🌹";
-                    else if (plot.type === 'sunflower') plantEl.innerText = "🌻";
-                    else if (plot.type === 'tree') plantEl.innerText = "🌲";
+                selectedSeedKey = null;
+                document.querySelectorAll('.seed-item').forEach(el => el.classList.remove('selected'));
+            } 
+            else if (plot.status === 'growing') {
+                const now = Date.now();
+                if (now >= plot.timeEnd) {
+                    plot.status = 'harvest';
+                    localPlots[index] = plot;
+                    set(ref(db, 'plots'), localPlots);
+                    alert("Oa! Cây hoa đã nở rộ, hãy nhấn vào một lần nữa để thu hoạch điểm ngọt ngào nhé! 🌹");
+                } else {
+                    alert("Cây vẫn đang trong quá trình lớn mầm, hãy kiên nhẫn đợi thêm chút nha! 💦");
+                }
+            } 
+            else if (plot.status === 'harvest') {
+                const flower = flowersCatalog[plot.plantKey];
+                const targetScore = currentScore + flower.sell;
+                set(ref(db, 'score'), targetScore);
+
+                push(ref(db, 'history'), `[+${flower.sell}đ] Thu hoạch đóa hoa thành công từ ô đất số ${index + 1} 🎉`);
+                alert(`Chúc mừng bé! Thu hoạch thành công đóa ${flower.name} xinh tươi và nhận về +${flower.sell} điểm!`);
+
+                localPlots[index] = { status: 'empty', plantKey: '', timeEnd: 0, stage: 1 };
+                set(ref(db, 'plots'), localPlots);
+            }
+        };
+
+        function renderGardenGrid() {
+            const now = Date.now();
+            for (let i = 0; i < 6; i++) {
+                const plot = localPlots[i];
+                const emojiEl = document.getElementById(`p-emoji-${i}`);
+                const timerEl = document.getElementById(`p-time-${i}`);
+
+                if (plot.status === 'empty') {
+                    emojiEl.innerText = "🟫";
+                    timerEl.style.display = 'none';
+                } else {
+                    const flower = flowersCatalog[plot.plantKey];
+                    const timeLeft = Math.max(0, Math.round((plot.timeEnd - now) / 1000));
+
+                    if (timeLeft > 0) {
+                        emojiEl.innerText = timeLeft > (flower.time / 2) ? "🌱" : "🌿";
+                        timerEl.style.display = 'block';
+                        timerEl.innerText = `${timeLeft}s`;
+                    } else {
+                        emojiEl.innerText = flower.emoji;
+                        timerEl.style.display = 'block';
+                        timerEl.innerText = "Hái 🎁";
+                        timerEl.style.background = '#4caf50';
+                    }
                 }
             }
         }
-    }
-</script>
 
+        setInterval(renderGardenGrid, 1000);
+
+        const audio = document.getElementById('bg-audio');
+        const musicIcon = document.getElementById('music-icon');
+        window.toggleMusic = function() {
+            if (audio.paused) {
+                audio.play();
+                musicIcon.className = "fas fa-heartbeat";
+            } else {
+                audio.pause();
+                musicIcon.className = "fas fa-music";
+            }
+        };
+    </script>
 </body>
 </html>
