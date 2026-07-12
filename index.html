@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Tích Điểm</title>
+    <title>Hệ Thống Quản Lý Tích Điểm</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -57,18 +57,34 @@
 
         .section-title { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-main); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
         
-        /* --- KHU VƯỜN 6 Ô --- */
-        .garden-layout { display: flex; gap: 15px; margin-bottom: 30px; }
-        .garden-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; flex: 1; }
-        .plot { aspect-ratio: 1; background: var(--bg-body); border-radius: var(--radius-sm); border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; cursor: pointer; transition: all 0.2s ease; }
-        .plot:hover { background: var(--pastel-pink); border-color: var(--pastel-pink-dark); transform: scale(1.02); }
-        .plot-emoji { font-size: 26px; }
-        .plot-timer { font-size: 10px; font-weight: 700; background: var(--text-main); color: white; padding: 2px 6px; border-radius: 6px; position: absolute; bottom: 6px; }
+        /* --- KHU VƯỜN 6 Ô THIẾT KẾ MỚI SIÊU ĐẸP --- */
+        .garden-layout { display: flex; gap: 15px; margin-bottom: 30px; background: #fffcfc; padding: 15px; border-radius: var(--radius-md); border: 1px solid var(--border); }
+        .garden-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; flex: 1; }
         
-        .seed-sidebar { width: 120px; background: var(--bg-body); border-radius: var(--radius-md); padding: 10px; display: flex; flex-direction: column; gap: 8px; max-height: 204px; overflow-y: auto; border: 1px solid var(--border); }
-        .seed-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 4px; display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: 700; cursor: pointer; text-align: center; transition: all 0.2s ease; }
-        .seed-item:hover { border-color: var(--pastel-pink-dark); }
-        .seed-item.selected { border-color: var(--pastel-pink-dark); background: var(--pastel-pink); }
+        /* Ô đất nung pastel xịn sò */
+        .plot { aspect-ratio: 1; background: #fceade; border-radius: var(--radius-sm); border: 2px solid #f3d1be; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: inset 0 4px 6px rgba(139, 94, 60, 0.05); }
+        .plot:hover { border-color: var(--pastel-pink-dark); transform: scale(1.04); box-shadow: 0 6px 15px rgba(255, 179, 198, 0.2); }
+        
+        /* Cây đang lớn sẽ đổi sang nền xanh nhẹ mượt mà */
+        .plot.growing-state { background: #eef9f0; border-color: #c8e6c9; }
+        /* Cây đã chín đổi sang nền hồng ngọt ngào sẵn sàng thu hoạch */
+        .plot.harvest-state { background: var(--pastel-pink); border-color: var(--pastel-pink-dark); animation: pulseGlow 1.5s infinite ease-in-out; }
+        
+        @keyframes pulseGlow { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); border-color: #ff8fab; } }
+
+        .plot-emoji { font-size: 28px; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.06)); transition: transform 0.2s; }
+        .plot:active .plot-emoji { transform: scale(0.8); }
+
+        /* Khay đếm thời gian nhỏ nhắn tinh tế */
+        .plot-timer { font-size: 9px; font-weight: 800; background: rgba(43, 43, 43, 0.85); color: white; padding: 2px 6px; border-radius: 20px; position: absolute; bottom: 6px; backdrop-filter: blur(2px); letter-spacing: 0.3px; }
+        .plot-timer.ready { background: #2b2b2b; animation: bounce 0.6s infinite alternate; }
+        @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-2px); } }
+        
+        /* Thanh dọc hạt giống chỉn chu hơn */
+        .seed-sidebar { width: 120px; background: var(--bg-card); border-radius: var(--radius-sm); padding: 8px; display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; border: 1px solid var(--border); }
+        .seed-item { background: var(--bg-body); border: 1px solid transparent; border-radius: 10px; padding: 10px 4px; display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: 700; cursor: pointer; text-align: center; transition: all 0.2s ease; }
+        .seed-item:hover { background: #fff0f3; border-color: var(--pastel-pink); }
+        .seed-item.selected { border-color: var(--pastel-pink-dark); background: var(--pastel-pink); box-shadow: 0 4px 10px rgba(255, 179, 198, 0.3); }
 
         /* --- LIST CARD CHI TIẾT --- */
         .list-group { display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto; padding-right: 4px; }
@@ -147,15 +163,16 @@
             </button>
         </div>
 
-        <div class="section-title"><i class="fas fa-seedling"></i> Trồng cây thu hoạch điểm</div>
+        <!-- KHU VƯỜN ĐÃ ĐƯỢC THIẾT KẾ ĐẸP HƠN -->
+        <div class="section-title"><i class="fas fa-seedling"></i> Khu vườn ngọt ngào của bạn</div>
         <div class="garden-layout">
             <div class="garden-grid">
-                <div class="plot" onclick="clickPlot(0)"><span class="plot-emoji" id="p-emoji-0">◼️</span><div class="plot-timer" id="p-time-0" style="display:none;"></div></div>
-                <div class="plot" onclick="clickPlot(1)"><span class="plot-emoji" id="p-emoji-1">◼️</span><div class="plot-timer" id="p-time-1" style="display:none;"></div></div>
-                <div class="plot" onclick="clickPlot(2)"><span class="plot-emoji" id="p-emoji-2">◼️</span><div class="plot-timer" id="p-time-2" style="display:none;"></div></div>
-                <div class="plot" onclick="clickPlot(3)"><span class="plot-emoji" id="p-emoji-3">◼️</span><div class="plot-timer" id="p-time-3" style="display:none;"></div></div>
-                <div class="plot" onclick="clickPlot(4)"><span class="plot-emoji" id="p-emoji-4">◼️</span><div class="plot-timer" id="p-time-4" style="display:none;"></div></div>
-                <div class="plot" onclick="clickPlot(5)"><span class="plot-emoji" id="p-emoji-5">◼️</span><div class="plot-timer" id="p-time-5" style="display:none;"></div></div>
+                <div class="plot" id="plot-0" onclick="clickPlot(0)"><span class="plot-emoji" id="p-emoji-0">🌱</span><div class="plot-timer" id="p-time-0" style="display:none;"></div></div>
+                <div class="plot" id="plot-1" onclick="clickPlot(1)"><span class="plot-emoji" id="p-emoji-1">🌱</span><div class="plot-timer" id="p-time-1" style="display:none;"></div></div>
+                <div class="plot" id="plot-2" onclick="clickPlot(2)"><span class="plot-emoji" id="p-emoji-2">🌱</span><div class="plot-timer" id="p-time-2" style="display:none;"></div></div>
+                <div class="plot" id="plot-3" onclick="clickPlot(3)"><span class="plot-emoji" id="p-emoji-3">🌱</span><div class="plot-timer" id="p-time-3" style="display:none;"></div></div>
+                <div class="plot" id="plot-4" onclick="clickPlot(4)"><span class="plot-emoji" id="p-emoji-4">🌱</span><div class="plot-timer" id="p-time-4" style="display:none;"></div></div>
+                <div class="plot" id="plot-5" onclick="clickPlot(5)"><span class="plot-emoji" id="p-emoji-5">🌱</span><div class="plot-timer" id="p-time-5" style="display:none;"></div></div>
             </div>
             <div class="seed-sidebar" id="sidebar-seeds"></div>
         </div>
@@ -281,7 +298,6 @@
         let lastAttendanceDate = "";
         let localPlots = Array(6).fill({ status: 'empty', plantKey: '', timeEnd: 0 });
 
-        // --- CUSTOM TOAST MESSAGE ---
         window.showToast = function(msg) {
             const container = document.getElementById('toast-container');
             const el = document.createElement('div');
@@ -495,26 +511,30 @@
             const now = Date.now();
             for (let i = 0; i < 6; i++) {
                 const plot = localPlots[i] || { status: 'empty' };
+                const plotEl = document.getElementById(`plot-${i}`);
                 const emojiEl = document.getElementById(`p-emoji-${i}`);
                 const timerEl = document.getElementById(`p-time-${i}`);
 
                 if (plot.status === 'empty') {
-                    emojiEl.innerText = "◼️";
+                    plotEl.className = "plot";
+                    emojiEl.innerText = "🤎"; // Đất trống dễ thương
                     timerEl.style.display = 'none';
                 } else {
                     const flower = flowersCatalog[plot.plantKey];
                     const timeLeft = Math.max(0, Math.round((plot.timeEnd - now) / 1000));
 
                     if (timeLeft > 0) {
-                        emojiEl.innerText = "🌱";
+                        plotEl.className = "plot growing-state";
+                        emojiEl.innerText = "🌱"; // Mầm non đang lớn
+                        timerEl.className = "plot-timer";
                         timerEl.style.display = 'block';
                         timerEl.innerText = `${timeLeft}s`;
-                        timerEl.style.background = "var(--text-main)";
                     } else {
-                        emojiEl.innerText = flower.emoji;
+                        plotEl.className = "plot harvest-state";
+                        emojiEl.innerText = flower.emoji; // Hoa nở rực rỡ
+                        timerEl.className = "plot-timer ready";
                         timerEl.style.display = 'block';
                         timerEl.innerText = "Thu hoạch";
-                        timerEl.style.background = "#2b2b2b";
                     }
                 }
             }
