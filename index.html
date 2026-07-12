@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khu Vườn Tích Điểm</title>
+    <style>
+        :root {
+            --bg-color: #ffeef2;
+            --card-bg: #ffffff;
+            --text-main: #6c4b5e;
+            --accent-pink: #ffb7c5;
+            --accent-soft: #ffcad4;
+            --btn-boy: #a8dadc;
+            --btn-girl: #ffb7b2;
+            --gold: #ffd166;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 500px; background: var(--card-bg); padding: 25px; border-radius: 30px; box-shadow: 0 10px 30px rgba(255, 183, 197, 0.3); border: 4px solid #fff; }
+        h1 { text-align: center; font-size: 24px; margin-bottom: 20px; color: #ff758f; position: relative; }
+        .score-board { display: flex; justify-content: space-between; align-items: center; background: var(--bg-color); padding: 15px 20px; border-radius: 20px; margin-bottom: 25px; border: 2px dashed var(--accent-pink); }
+        .score-title { font-weight: bold; font-size: 16px; display: flex; align-items: center; gap: 5px; }
+        .score-val { font-size: 32px; font-weight: 900; color: #ff477e; text-shadow: 1px 1px #fff; }
+        
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab-btn { flex: 1; padding: 12px; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; background: #eee; color: #777; transition: all 0.3s; }
+        .tab-btn.active { background: var(--accent-pink); color: #fff; box-shadow: 0 4px 10px rgba(255, 117, 143, 0.2); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .mission-group { display: flex; flex-direction: column; gap: 12px; }
+        .mission-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: #fffafb; border: 1px solid var(--accent-soft); border-radius: 15px; transition: transform 0.2s; }
+        .mission-item:hover { transform: translateY(-2px); }
+        .m-info { display: flex; flex-direction: column; gap: 2px; }
+        .m-title { font-weight: 600; font-size: 14px; }
+        .m-pts { font-size: 12px; color: #ff758f; font-weight: bold; }
+        .btn-action { padding: 8px 16px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; color: #fff; box-shadow: 0 3px 6px rgba(0,0,0,0.05); }
+        .btn-boy { background-color: var(--btn-boy); color: #3d5a80; }
+        .btn-girl { background-color: var(--btn-girl); color: #6d4c41; }
+
+        /* Vườn Cây */
+        .garden-desc { text-align: center; font-size: 13px; margin-bottom: 15px; color: #888; }
+        .garden-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
+        .plot { aspect-ratio: 1; background: #e0d0c0; border-radius: 15px; border: 3px solid #b09070; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; cursor: pointer; transition: all 0.2s; }
+        .plot:hover { background: #d0c0b0; }
+        .plot-plant { font-size: 36px; line-height: 1; z-index: 2; }
+        .plot-progress { position: absolute; bottom: 5px; left: 5px; right: 5px; height: 6px; background: rgba(0,0,0,0.1); border-radius: 3px; overflow: hidden; display: none; }
+        .plot-progress-bar { height: 100%; background: #4caf50; width: 0%; transition: width 0.5s; }
+        .seed-shop { display: flex; justify-content: center; gap: 15px; background: #fdf5f6; padding: 15px; border-radius: 20px; border: 1px solid var(--accent-soft); }
+        .seed-btn { display: flex; flex-direction: column; align-items: center; background: #fff; border: 2px solid var(--accent-soft); padding: 10px; border-radius: 15px; cursor: pointer; font-weight: bold; font-size: 13px; width: 80px; gap: 5px; }
+        .seed-btn:hover { border-color: var(--accent-pink); }
+        .seed-btn.selected { border-color: #ff477e; background: #fff0f3; }
+
+        /* Cửa hàng quà tặng */
+        .shop-grid { display: flex; flex-direction: column; gap: 12px; }
+        .shop-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #fff; border: 2px solid #f0f0f0; border-radius: 18px; }
+        .shop-cost { font-size: 13px; color: #bcaaa4; font-weight: bold; margin-top: 2px; }
+        .btn-buy { background: var(--gold); color: #6c5c00; }
+
+        /* Thông báo / Lịch sử */
+        .history-box { margin-top: 25px; border-top: 2px dashed var(--accent-soft); padding-top: 15px; }
+        .history-title { font-size: 14px; font-weight: bold; margin-bottom: 10px; color: #888; display: flex; align-items: center; gap: 5px; }
+        .history-list { max-height: 120px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+        .history-item { padding: 6px 10px; background: #fdf8f9; border-radius: 8px; border-left: 3px solid var(--accent-pink); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1> Vườn Điểm</h1>
+
+    <!-- Bảng Điểm Chung -->
+    <div class="score-board">
+        <div class="score-title">✨ Điểm Tích Lũy Chung:</div>
+        <div class="score-val" id="total-score">0</div>
+    </div>
+
+    <!-- Thanh Tabs điều hướng -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('tab-mission')">📋 Nhiệm Vụ</button>
+        <button class="tab-btn" onclick="switchTab('tab-garden')">🌱 Khu Vườn</button>
+        <button class="tab-btn" onclick="switchTab('tab-shop')">🎁 Đổi Quà</button>
+    </div>
+
+    <!-- TAB 1: NHIỆM VỤ -->
+    <div id="tab-mission" class="tab-content active">
+        <div class="mission-group">
+            <div class="mission-item">
+                <div class="m-info"><span class="m-title">☀️ Điểm danh ngày mới</span><span class="m-pts">+10 điểm</span></div>
+                <div>
+                    <button class="btn-action btn-boy" onclick="addPoints(10, 'Bạn nam điểm danh ngày mới ☀️')">Nam</button>
+                    <button class="btn-action btn-girl" onclick="addPoints(10, 'Bạn nữ điểm danh ngày mới ☀️')">Nữ</button>
+                </div>
+            </div>
+            <div class="mission-item">
+                <div class="m-info"><span class="m-title">🥛 Uống đủ nước hôm nay</span><span class="m-pts">+5 điểm</span></div>
+                <div>
+                    <button class="btn-action btn-boy" onclick="addPoints(5, 'Bạn nam uống đủ nước 🥛')">Nam</button>
+                    <button class="btn-action btn-girl" onclick="addPoints(5, 'Bạn nữ uống đủ nước 🥛')">Nữ</button>
+                </div>
+            </div>
+            <div class="mission-item">
+                <div class="m-info"><span class="m-title">🍚 Ăn uống đúng giờ</span><span class="m-pts">+15 điểm</span></div>
+                <div>
+                    <button class="btn-action btn-boy" onclick="addPoints(15, 'Bạn nam ăn uống đúng giờ 🍚')">Nam</button>
+                    <button class="btn-action btn-girl" onclick="addPoints(15, 'Bạn nữ ăn uống đúng giờ 🍚')">Nữ</button>
+                </div>
+            </div>
+            <div class="mission-item">
+                <div class="m-info"><span class="m-title">🌙 Đi ngủ trước 23h</span><span class="m-pts">+20 điểm</span></div>
+                <div>
+                    <button class="btn-action btn-boy" onclick="addPoints(20, 'Bạn nam đi ngủ sớm 🌙')">Nam</button>
+                    <button class="btn-action btn-girl" onclick="addPoints(20, 'Bạn nữ đi ngủ sớm 🌙')">Nữ</button>
+                </div>
+            </div>
+            <div class="mission-item">
+                <div class="m-info"><span class="m-title">🥰 Làm người kia vui lòng</span><span class="m-pts">+30 điểm</span></div>
+                <div>
+                    <button class="btn-action btn-boy" onclick="addPoints(30, 'Bạn nam làm người yêu vui 🥰')">Nam</button>
+                    <button class="btn-action btn-girl" onclick="addPoints(30, 'Bạn nữ làm người yêu vui 🥰')">Nữ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 2: KHU VƯỜN -->
+    <div id="tab-garden" class="tab-content">
+        <p class="garden-desc">Dùng điểm mua hạt giống, trồng vào ô đất và đợi hoa nở để nhận quà siêu lớn!</p>
+        <div class="garden-grid">
+            <div class="plot" onclick="clickPlot(0)"><span class="plot-plant" id="plant-0">🤎</span><div class="plot-progress"><div class="plot-progress-bar" id="bar-0"></div></div></div>
+            <div class="plot" onclick="clickPlot(1)"><span class="plot-plant" id="plant-1">🤎</span><div class="plot-progress"><div class="plot-progress-bar" id="bar-1"></div></div></div>
+            <div class="plot" onclick="clickPlot(2)"><span class="plot-plant" id="plant-2">🤎</span><div class="plot-progress"><div class="plot-progress-bar" id="bar-2"></div></div></div>
+            <div class="plot" onclick="clickPlot(3)"><span class="plot-plant" id="plant-3">🤎</span><div class="plot-progress"><div class="plot-progress-bar" id="bar-3"></div></div></div>
+            <div class="plot" onclick="clickPlot(4)"><span class="plot-plant" id="plant-4">🤎</span><div class="plot-progress"><div class="plot-progress-bar" id="bar-4"></div></div></div>
+            <div class="plot" onclick="clickPlot(5)"><span class="plot-plant" id="plant-5">🤎</span><div class="plot-progress"><div class="plot-progress-bar" id="bar-5"></div></div></div>
+        </div>
+        <div class="seed-shop">
+            <button class="seed-btn" id="seed-rose" onclick="selectSeed('rose', 30)">🌹<span>30đ</span></button>
+            <button class="seed-btn" id="seed-sunflower" onclick="selectSeed('sunflower', 50)">🌻<span>50đ</span></button>
+            <button class="seed-btn" id="seed-tree" onclick="selectSeed('tree', 100)">🌲<span>100đ</span></button>
+        </div>
+    </div>
+
+    <!-- TAB 3: ĐỔI QUÀ -->
+    <div id="tab-shop" class="tab-content">
+        <div class="shop-grid">
+            <div class="shop-item">
+                <div><div style="font-weight: 600;">🥤 Một ly trà sữa size L</div><div class="shop-cost">Giá: 150 điểm</div></div>
+                <button class="btn-action btn-buy" onclick="buyGift(150, 'Đổi 1 ly trà sữa thơm ngon 🥤')">Đổi quà</button>
+            </div>
+            <div class="shop-item">
+                <div><div style="font-weight: 600;">🍿 Một buổi đi xem phim cùng nhau</div><div class="shop-cost">Giá: 300 điểm</div></div>
+                <button class="btn-action btn-buy" onclick="buyGift(300, 'Đổi 1 buổi xem phim lãng mạn 🍿')">Đổi quà</button>
+            </div>
+            <div class="shop-item">
+                <div><div style="font-weight: 600;">🧸 Một cái ôm thật ấm áp</div><div class="shop-cost">Giá: 50 điểm</div></div>
+                <button class="btn-action btn-buy" onclick="buyGift(50, 'Đổi một cái ôm ấm áp 🧸')">Đổi quà</button>
+            </div>
+            <div class="shop-item">
+                <div><div style="font-weight: 600;">❌ 1 lần tha thứ lỗi lầm</div><div class="shop-cost">Giá: 200 điểm</div></div>
+                <button class="btn-action btn-buy" onclick="buyGift(200, 'Đổi 1 thẻ miễn tội tha thứ lỗi lầm ❌')">Đổi quà</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lịch sử hoạt động -->
+    <div class="history-box">
+        <div class="history-title">⏱️ Nhật ký ngọt ngào mới nhất:</div>
+        <div class="history-list" id="history-content">
+            <div class="history-item">Hệ thống đã kết nối sẵn sàng...</div>
+        </div>
+    </div>
+</div>
+
+<!-- KẾT NỐI SỢI DÂY LIÊN KẾT ĐẾN FIREBASE CỦA BẠN (QWERTY) -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue, set, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    // Đoạn cấu hình chuẩn của riêng bạn:
+    const firebaseConfig = {
+        apiKey: "AIzaSyCJip89os02VXHsbdFoad3o_S7QpX0ce6Y",
+        databaseURL: "https://qwerty-40818-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "qwerty-40818"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // Biến toàn cục cục bộ để theo dõi trạng thái
+    let currentScore = 0;
+    let selectedSeedType = null;
+    let selectedSeedCost = 0;
+    let localPlots = [
+        {status: 'empty', type: '', stage: 0, timeStarted: 0},
+        {status: 'empty', type: '', stage: 0, timeStarted: 0},
+        {status: 'empty', type: '', stage: 0, timeStarted: 0},
+        {status: 'empty', type: '', stage: 0, timeStarted: 0},
+        {status: 'empty', type: '', stage: 0, timeStarted: 0},
+        {status: 'empty', type: '', stage: 0, timeStarted: 0}
+    ];
+
+    // Lắng nghe dữ liệu Điểm số từ Firebase truyền về máy
+    onValue(ref(db, 'score'), (snapshot) => {
+        currentScore = snapshot.val() || 0;
+        document.getElementById('total-score').innerText = currentScore;
+    });
+
+    // Lắng nghe dữ liệu Nhật ký từ Firebase
+    onValue(ref(db, 'history'), (snapshot) => {
+        const list = document.getElementById('history-content');
+        list.innerHTML = "";
+        const data = snapshot.val();
+        if (data) {
+            const arr = Object.values(data).reverse(); // Hiện tin mới lên trên đầu
+            arr.slice(0, 15).forEach(msg => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.innerText = msg;
+                list.appendChild(item);
+            });
+        } else {
+            list.innerHTML = `<div class="history-item">Chưa có hoạt động nào được ghi lại.</div>`;
+        }
+    });
+
+    // Lắng nghe dữ liệu các ô đất của Khu Vườn
+    onValue(ref(db, 'plots'), (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            localPlots = data;
+        }
+        updateGardenUI();
+    });
+
+    // Hàm chuyển đổi Tab qua lại
+    window.switchTab = function(tabId) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    };
+
+    // Hàm cộng điểm nhiệm vụ
+    window.addPoints = function(pts, actionText) {
+        const newScore = currentScore + pts;
+        set(ref(db, 'score'), newScore);
+        push(ref(db, 'history'), `[+${pts}đ] ${actionText}`);
+    };
+
+    // Hàm đổi quà tặng trong shop
+    window.buyGift = function(cost, giftText) {
+        if (currentScore < cost) {
+            alert("Bạn không đủ điểm rồi, hãy chăm chỉ làm thêm nhiệm vụ nhé! 💪");
+            return;
+        }
+        const newScore = currentScore - cost;
+        set(ref(db, 'score'), newScore);
+        push(ref(db, 'history'), `[-${cost}đ] Người ấy đã đổi quà: ${giftText} 🎉`);
+        alert("Đổi quà thành công! Mau gửi ảnh màn hình cho người ấy để nhận quà nha 💖");
+    };
+
+    // Hàm chọn loại hạt giống
+    window.selectSeed = function(seedType, cost) {
+        document.querySelectorAll('.seed-btn').forEach(b => b.classList.remove('selected'));
+        if (selectedSeedType === seedType) {
+            selectedSeedType = null;
+            selectedSeedCost = 0;
+        } else {
+            selectedSeedType = seedType;
+            selectedSeedCost = cost;
+            document.getElementById(`seed-${seedType}`).classList.add('selected');
+        }
+    };
+
+    // Xử lý khi nhấn chuột vào ô đất trống hoặc cây trồng
+    window.clickPlot = function(index) {
+        let plot = localPlots[index] || {status: 'empty', type: '', stage: 0};
+        
+        if (plot.status === 'empty') {
+            if (!selectedSeedType) {
+                alert("Vui lòng chọn một loại hạt giống ở phía dưới trước khi gieo nha!");
+                return;
+            }
+            if (currentScore < selectedSeedCost) {
+                alert("Bạn không đủ điểm để mua hạt giống này rồi!");
+                return;
+            }
+            
+            // Trừ điểm mua hạt giống và tiến hành trồng cây
+            const newScore = currentScore - selectedSeedCost;
+            set(ref(db, 'score'), newScore);
+            
+            plot = {
+                status: 'growing',
+                type: selectedSeedType,
+                stage: 1,
+                timeStarted: Date.now()
+            };
+            localPlots[index] = plot;
+            set(ref(db, 'plots'), localPlots);
+            push(ref(db, 'history'), `[-${selectedSeedCost}đ] Đã mua hạt giống và gieo mầm cây mới 🌱`);
+            
+            // Bỏ chọn hạt giống sau khi đã gieo xong
+            document.querySelectorAll('.seed-btn').forEach(b => b.classList.remove('selected'));
+            selectedSeedType = null;
+            selectedSeedCost = 0;
+        } 
+        else if (plot.status === 'growing') {
+            if (plot.stage < 3) {
+                plot.stage += 1;
+                localPlots[index] = plot;
+                set(ref(db, 'plots'), localPlots);
+                push(ref(db, 'history'), `💦 Tưới nước giúp cây ở ô đất số ${index + 1} lớn thêm một chút!`);
+            } else {
+                plot.status = 'harvest';
+                localPlots[index] = plot;
+                set(ref(db, 'plots'), localPlots);
+            }
+        } 
+        else if (plot.status === 'harvest') {
+            let bonus = 40;
+            if (plot.type === 'sunflower') bonus = 70;
+            if (plot.type === 'tree') bonus = 150;
+            
+            const newScore = currentScore + bonus;
+            set(ref(db, 'score'), newScore);
+            
+            plot = {status: 'empty', type: '', stage: 0, timeStarted: 0};
+            localPlots[index] = plot;
+            set(ref(db, 'plots'), localPlots);
+            push(ref(db, 'history'), `🎁 Thu hoạch cây thành công! Nhận về phần thưởng siêu to khổng lồ: +${bonus} điểm thưởng!`);
+            alert(`🎉 Chúc mừng bạn đã thu hoạch cây thành công và nhận thêm +${bonus} điểm thưởng ngọt ngào!`);
+        }
+    };
+
+    // Hàm cập nhật trạng thái hiển thị của các ô đất sang hình vẽ Emoji tương ứng
+    function updateGardenUI() {
+        for (let i = 0; i < 6; i++) {
+            const plot = localPlots[i] || {status: 'empty', type: '', stage: 0};
+            const plantEl = document.getElementById(`plant-${i}`);
+            const barContainer = plantEl.nextElementSibling;
+            const barEl = document.getElementById(`bar-${i}`);
+            
+            if (plot.status === 'empty') {
+                plantEl.innerText = "棕"; // Hình biểu tượng ô đất nâu trống
+                barContainer.style.display = "none";
+            } 
+            else if (plot.status === 'growing' || plot.status === 'harvest') {
+                barContainer.style.display = "block";
+                let percent = (plot.stage / 3) * 100;
+                barEl.style.width = `${percent}%`;
+                
+                if (plot.stage === 1) plantEl.innerText = "🌱";
+                else if (plot.stage === 2) plantEl.innerText = "🌿";
+                else if (plot.stage === 3) {
+                    barEl.style.width = `100%`;
+                    if (plot.type === 'rose') plantEl.innerText = "🌹";
+                    else if (plot.type === 'sunflower') plantEl.innerText = "🌻";
+                    else if (plot.type === 'tree') plantEl.innerText = "🌲";
+                }
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
