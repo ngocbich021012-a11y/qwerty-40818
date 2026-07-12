@@ -3,217 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Khu Vườn Tình Yêu Của Hai Đứa</title>
-    <!-- Thêm thư viện nhạc nền FontAwesome và Google Fonts để tăng độ cute -->
+    <title> Tích điểm đổi quà </title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --bg-pastel: #fff0f3;
-            --pink-main: #ffb7c5;
-            --pink-dark: #ff758f;
-            --pink-light: #ffe5ec;
-            --text-color: #5c3d46;
-            --white: #ffffff;
-            --boy-color: #a8dadc;
-            --mint: #b7e4c7;
+            --bg-clean: #ffffff;
+            --text-main: #1a1a1a;
+            --text-muted: #666666;
+            --border-color: #e0e0e0;
+            --accent-pink: #ffd6ba;
+            --accent-green: #d8f3dc;
+            --accent-gray: #f5f5f5;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: var(--bg-pastel); color: var(--text-color); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 10px; overflow-x: hidden; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--accent-gray); color: var(--text-main); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 15px; }
         
-        /* --- GIAO DIỆN LOADING CUTE --- */
-        #loading-screen { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--pink-light); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s ease; }
-        .loading-heart { font-size: 60px; color: var(--pink-dark); animation: beat 1s infinite alternate; }
-        .loading-text { margin-top: 20px; font-weight: bold; font-size: 18px; color: var(--pink-dark); letter-spacing: 2px; }
-        @keyframes beat { to { transform: scale(1.3); } }
+        /* --- MÀN HÌNH LOADING MINIMALIST --- */
+        #loading-screen { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg-clean); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .loading-icon { font-size: 40px; color: var(--text-main); animation: rotate 1.5s infinite linear; }
+        .loading-text { margin-top: 15px; font-weight: 500; font-size: 14px; letter-spacing: 1px; color: var(--text-muted); }
+        @keyframes rotate { to { transform: rotate(360deg); } }
 
         /* --- CONTAINER CHÍNH --- */
-        .app-container { width: 100%; max-width: 480px; background: var(--white); border-radius: 30px; box-shadow: 0 10px 30px rgba(255, 117, 143, 0.2); border: 5px solid var(--pink-light); padding: 20px; position: relative; display: none; }
+        .app-container { width: 100%; max-width: 520px; background: var(--bg-clean); border-radius: 20px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); border: 1px solid var(--border-color); padding: 25px; position: relative; display: none; }
         
-        /* Nhạc nền điều khiển */
-        .music-ctrl { position: absolute; top: 15px; right: 15px; background: var(--pink-light); border: none; width: 35px; height: 35px; border-radius: 50%; color: var(--pink-dark); cursor: pointer; display: flex; align-items: center; justify-content: center; }
-
-        h1 { text-align: center; font-size: 22px; color: var(--pink-dark); margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        h1 { text-align: center; font-size: 24px; font-weight: 700; margin-bottom: 20px; letter-spacing: -0.5px; }
         
-        /* Bảng hiển thị điểm */
-        .score-box { background: var(--pink-light); padding: 15px; border-radius: 20px; text-align: center; margin-bottom: 20px; border: 2px dashed var(--pink-main); }
-        .score-num { font-size: 40px; font-weight: 900; color: var(--pink-dark); text-shadow: 2px 2px #fff; }
-        .streak-info { font-size: 13px; font-weight: bold; color: #666; margin-top: 5px; }
+        /* Bảng điểm to, rõ ràng */
+        .score-box { background: var(--bg-clean); padding: 25px 15px; border-radius: 16px; text-align: center; margin-bottom: 25px; border: 1px solid var(--border-color); }
+        .score-num { font-size: 56px; font-weight: 800; color: var(--text-main); line-height: 1; margin-bottom: 10px; }
+        .streak-info { font-size: 14px; font-weight: 600; color: var(--text-muted); background: var(--accent-gray); display: inline-block; padding: 6px 16px; border-radius: 20px; }
 
-        /* Chuyển đổi quyền Web */
-        .role-switcher { display: flex; background: #eee; border-radius: 12px; padding: 3px; margin-bottom: 15px; }
-        .role-btn { flex: 1; padding: 8px; border: none; background: transparent; cursor: pointer; border-radius: 10px; font-weight: bold; color: #777; transition: 0.3s; }
-        .role-btn.active { background: var(--pink-main); color: var(--white); }
+        /* Khối tính năng chính (Làm to lên) */
+        .section-title { font-size: 16px; font-weight: 700; margin: 25px 0 12px 0; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; }
+        
+        .main-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .action-card-btn { background: var(--bg-clean); border: 1px solid var(--border-color); padding: 16px; border-radius: 12px; cursor: pointer; text-align: left; transition: all 0.2s; display: flex; align-items: center; gap: 12px; }
+        .action-card-btn:hover { background: var(--accent-gray); border-color: var(--text-main); }
+        .action-card-btn i { font-size: 20px; }
 
-        /* Giao diện các Tab phụ */
-        .main-menu { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
-        .menu-btn { background: var(--pink-light); border: none; padding: 10px; border-radius: 15px; font-weight: bold; color: var(--text-color); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 13px; }
-        .menu-btn:hover { background: var(--pink-main); color: white; }
+        /* --- KHU VƯỜN TRỒNG CÂY 6 Ô --- */
+        .garden-layout { display: flex; gap: 15px; margin-top: 10px; }
+        .garden-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; flex: 1; }
+        .plot { aspect-ratio: 1; background: var(--accent-gray); border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; cursor: pointer; transition: 0.2s; }
+        .plot:hover { border-color: var(--text-main); }
+        .plot-emoji { font-size: 28px; }
+        .plot-timer { font-size: 10px; background: var(--text-main); color: white; padding: 2px 6px; border-radius: 6px; position: absolute; bottom: 6px; }
+        
+        .seed-sidebar { width: 110px; background: var(--accent-gray); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 8px; max-height: 230px; overflow-y: auto; border: 1px solid var(--border-color); }
+        .seed-item { background: var(--bg-clean); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: 600; cursor: pointer; text-align: center; }
+        .seed-item.selected { border-color: var(--text-main); background: var(--accent-pink); }
 
-        .panel { display: none; }
-        .panel.active { display: block; }
-
-        /* --- STYLE CHO DANH SÁCH NHIỆM VỤ / CỦA HÀNG --- */
-        .list-group { display: flex; flex-direction: column; gap: 10px; max-height: 320px; overflow-y: auto; padding-right: 5px; }
-        .item-card { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #fffafb; border: 1px solid var(--pink-light); border-radius: 15px; }
+        /* --- DANH SÁCH / TIỆM ĐỔI QUÀ --- */
+        .list-group { display: flex; flex-direction: column; gap: 8px; max-height: 260px; overflow-y: auto; }
+        .item-card { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--bg-clean); border: 1px solid var(--border-color); border-radius: 12px; }
         .item-info { display: flex; flex-direction: column; gap: 2px; }
-        .item-title { font-weight: bold; font-size: 14px; }
-        .item-val { font-size: 12px; font-weight: bold; }
-        .val-plus { color: #4caf50; }
-        .val-minus { color: #e63946; }
+        .item-title { font-weight: 600; font-size: 14px; }
+        .item-val { font-size: 12px; font-weight: 700; }
+        .val-plus { color: #2e7d32; }
+        .val-minus { color: #c62828; }
 
-        .btn-action { padding: 6px 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; color: white; }
-        .btn-add { background: var(--pink-dark); }
-        .btn-buy { background: #ffca3a; color: #5c4d00; }
+        .btn-action { padding: 8px 16px; border: 1px solid var(--text-main); border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; background: var(--bg-clean); color: var(--text-main); transition: 0.2s; }
+        .btn-action:hover { background: var(--text-main); color: var(--bg-clean); }
 
-        /* --- KHU VƯỜN TRỒNG CÂY (6 Ô + THANH PHẢI) --- */
-        .garden-layout { display: flex; gap: 10px; margin-top: 10px; }
-        .garden-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; flex: 1; }
-        .plot { aspect-ratio: 1; background: #e6ccb2; border: 3px solid #b18567; border-radius: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; cursor: pointer; }
-        .plot-emoji { font-size: 32px; z-index: 2; }
-        .plot-timer { font-size: 10px; background: rgba(0,0,0,0.5); color: white; padding: 2px 5px; border-radius: 8px; position: absolute; bottom: 5px; display: none; }
+        /* --- NHẬT KÝ HOẠT ĐỘNG --- */
+        .history-box { margin-top: 25px; background: var(--accent-gray); border-radius: 14px; padding: 15px; border: 1px solid var(--border-color); }
+        .history-title { font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .history-list { max-height: 120px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+        .history-item { padding: 6px 10px; background: var(--bg-clean); border-radius: 8px; font-size: 12px; border: 1px solid var(--border-color); }
+
+        /* --- POPUP NỔI --- */
+        .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.2); z-index: 1000; display: none; justify-content: center; align-items: center; padding: 20px; }
+        .popup { background: var(--bg-clean); border-radius: 16px; padding: 24px; width: 100%; max-width: 440px; position: relative; border: 1px solid var(--border-color); }
+        .close-popup { position: absolute; top: 20px; right: 20px; font-size: 18px; cursor: pointer; color: var(--text-muted); }
         
-        .seed-sidebar { width: 95px; background: var(--pink-light); border-radius: 15px; padding: 8px; display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto; }
-        .seed-item { background: white; border: 2px solid transparent; border-radius: 10px; padding: 6px; display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: bold; cursor: grab; text-align: center; }
-        .seed-item.selected { border-color: var(--pink-dark); background: #fff0f3; }
+        .attendance-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 15px; }
+        .day-box { background: var(--accent-gray); border-radius: 8px; padding: 12px 6px; text-align: center; font-size: 12px; font-weight: 600; border: 1px solid var(--border-color); }
+        .day-box.checked { background: var(--accent-green); border-color: #2e7d32; }
 
-        /* --- POPUP / BẢNG ĐIỂM DANH TUẦN --- */
-        .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.4); z-index: 1000; display: none; justify-content: center; align-items: center; padding: 20px; }
-        .popup { background: white; border-radius: 25px; padding: 20px; width: 100%; max-width: 400px; position: relative; box-shadow: 0 5px 20px rgba(0,0,0,0.15); animation: popUp 0.3s ease; }
-        @keyframes popUp { from { transform: scale(0.8); opacity: 0; } }
-        .close-popup { position: absolute; top: 15px; right: 15px; font-size: 20px; cursor: pointer; color: #aaa; }
-        
-        .attendance-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px; }
-        .day-box { background: var(--pink-light); border-radius: 12px; padding: 10px 5px; text-align: center; font-size: 12px; font-weight: bold; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .day-box.checked { background: var(--mint); color: #2d6a4f; }
-
-        /* Nhật ký biến động điểm */
-        .history-box { margin-top: 15px; background: #fafafa; border-radius: 15px; padding: 10px; border: 1px solid #eee; }
-        .history-title { font-size: 13px; font-weight: bold; color: #888; margin-bottom: 5px; }
-        .history-list { max-height: 100px; overflow-y: auto; display: flex; flex-direction: column; gap: 5px; font-size: 12px; }
-        .history-item { padding: 5px 8px; background: #fff; border-radius: 6px; border-left: 3px solid var(--pink-main); }
+        /* Nút admin bí mật nhỏ gọn ở góc */
+        .admin-secret-btn { position: absolute; bottom: 15px; right: 20px; font-size: 12px; color: var(--text-muted); background: none; border: none; cursor: pointer; text-decoration: underline; }
     </style>
 </head>
 <body>
 
-    <!-- 1. MÀN HÌNH LOADING CUTE -->
+    <!-- 1. MÀN HÌNH LOADING MINIMALIST -->
     <div id="loading-screen">
-        <div class="loading-heart"><i class="fas fa-heart"></i></div>
-        <div class="loading-text">ĐANG TẢI VƯỜN YÊU...</div>
+        <div class="loading-icon"><i class="fas fa-circle-notch"></i></div>
+        <div class="loading-text">LOADING...</div>
     </div>
 
-    <!-- 2. GIAO DIỆN CHÍNH CỦA ỨNG DỤNG -->
+    <!-- 2. GIAO DIỆN CHÍNH (VÀO LÀ RA GIAO DIỆN BẠN NAM LUÔN) -->
     <div class="app-container" id="main-app">
-        <!-- Nút bật/tắt nhạc dễ thương -->
-        <button class="music-ctrl" onclick="toggleMusic()"><i id="music-icon" class="fas fa-music"></i></button>
-        <audio id="bg-audio" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+        <h1>HỆ THỐNG TÍCH ĐIỂM</h1>
 
-        <h1><i class="fas fa-sparkles"></i> Vườn Tình Yêu <i class="fas fa-sparkles"></i></h1>
-
-        <!-- BẢNG ĐIỂM CHUNG -->
+        <!-- KHỐI ĐIỂM SỐ TO RÕ RÀNG -->
         <div class="score-box">
-            <div style="font-weight: bold; font-size: 14px; color: #888;">Điểm tích lũy hiện tại</div>
             <div class="score-num" id="total-score">0</div>
-            <div class="streak-info" id="streak-text">🔥 Chuỗi đăng nhập ngày: 0 ngày</div>
+            <div class="streak-info" id="streak-text">Chuỗi đăng nhập: 0 ngày</div>
         </div>
 
-        <!-- THANH CHUYỂN WEB NAM VÀ NỮ -->
-        <div class="role-switcher">
-            <button class="role-btn active" id="btn-role-girl" onclick="switchRole('girl')">Web Bạn Nữ 👩‍🦰</button>
-            <button class="role-btn" id="btn-role-boy" onclick="switchRole('boy')">Web Bạn Nam (Tôi) 👨‍💻</button>
+        <!-- CÁC HÀNH ĐỘNG CHÍNH -->
+        <div class="main-actions">
+            <button class="action-card-btn" onclick="openPopup('pop-attendance')">
+                <i class="fas fa-calendar-check"></i>
+                <div>
+                    <div style="font-weight:700; font-size:15px;">Điểm Danh</div>
+                    <div style="font-size:12px; color:var(--text-muted);">Nhận điểm hàng ngày</div>
+                </div>
+            </button>
+            <button class="action-card-btn" onclick="openPopup('pop-shop')">
+                <i class="fas fa-store"></i>
+                <div>
+                    <div style="font-weight:700; font-size:15px;">Tiệm Đổi Quà</div>
+                    <div style="font-size:12px; color:var(--text-muted);">Sử dụng điểm tích lũy</div>
+                </div>
+            </button>
         </div>
 
-        <!-- ================= MÀN HÌNH BẠN NỮ ================= -->
-        <div id="panel-girl" class="panel active">
-            <div class="main-menu">
-                <button class="menu-btn" onclick="openPopup('pop-attendance')"><i class="fas fa-calendar-check" style="color: #4caf50;"></i>Điểm Danh</button>
-                <button class="menu-btn" onclick="openPopup('pop-garden')"><i class="fas fa-seedling" style="color: #2a9d8f;"></i>Trồng Cây</button>
-                <button class="menu-btn" onclick="openPopup('pop-shop')"><i class="fas fa-gift" style="color: #ffb703;"></i>Đổi Quà</button>
+        <!-- KHU VƯỜN TRỒNG CÂY TÍCH ĐIỂM -->
+        <div class="section-title"><i class="fas fa-seedling"></i> Khu Vườn Trồng Cây Tích Điểm</div>
+        <div class="garden-layout">
+            <div class="garden-grid">
+                <div class="plot" onclick="clickPlot(0)"><span class="plot-emoji" id="p-emoji-0">◼️</span><div class="plot-timer" id="p-time-0" style="display:none;"></div></div>
+                <div class="plot" onclick="clickPlot(1)"><span class="plot-emoji" id="p-emoji-1">◼️</span><div class="plot-timer" id="p-time-1" style="display:none;"></div></div>
+                <div class="plot" onclick="clickPlot(2)"><span class="plot-emoji" id="p-emoji-2">◼️</span><div class="plot-timer" id="p-time-2" style="display:none;"></div></div>
+                <div class="plot" onclick="clickPlot(3)"><span class="plot-emoji" id="p-emoji-3">◼️</span><div class="plot-timer" id="p-time-3" style="display:none;"></div></div>
+                <div class="plot" onclick="clickPlot(4)"><span class="plot-emoji" id="p-emoji-4">◼️</span><div class="plot-timer" id="p-time-4" style="display:none;"></div></div>
+                <div class="plot" onclick="clickPlot(5)"><span class="plot-emoji" id="p-emoji-5">◼️</span><div class="plot-timer" id="p-time-5" style="display:none;"></div></div>
             </div>
+            <div class="seed-sidebar" id="sidebar-seeds"></div>
         </div>
 
-        <!-- ================= MÀN HÌNH BẠN NAM (BẢNG ĐIỀU KHIỂN) ================= -->
-        <div id="panel-boy" class="panel">
-            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                <button class="tab-btn role-btn active" style="flex:1; padding: 5px;" onclick="switchAdminTab('add')">Cộng Điểm 👍</button>
-                <button class="tab-btn role-btn" style="flex:1; padding: 5px;" onclick="switchAdminTab('sub')">Trừ Điểm 👎</button>
-            </div>
-
-            <!-- Tab Bảng Cộng Điểm -->
-            <div id="admin-add" class="admin-tab-content">
-                <div class="list-group" id="list-plus-actions"></div>
-            </div>
-
-            <!-- Tab Bảng Trừ Điểm -->
-            <div id="admin-sub" class="admin-tab-content" style="display: none;">
-                <div class="list-group" id="list-minus-actions"></div>
-            </div>
-        </div>
-
-        <!-- NHẬT KÝ BIẾN ĐỘNG ĐIỂM CHUNG -->
+        <!-- NHẬT KÝ HOẠT ĐỘNG BIẾN ĐỘNG ĐIỂM -->
         <div class="history-box">
-            <div class="history-title"><i class="fas fa-history"></i> Nhật ký hoạt động ngọt ngào:</div>
+            <div class="history-title">Nhật ký hoạt động công khai</div>
             <div class="history-list" id="history-logs">
-                <div class="history-item">Hệ thống đang kết nối...</div>
+                <div class="history-item">Hệ thống đang đồng bộ dữ liệu...</div>
             </div>
         </div>
+
+        <!-- NÚT ĐIỀU KHIỂN THÊM ĐIỂM ẨN CÓ MẬT KHẨU -->
+        <button class="admin-secret-btn" onclick="accessAdminPanel()">[Quản trị viên]</button>
     </div>
 
-    <!-- ================= HỆ THỐNG POPUP NỔI (OVERLAYS) ================= -->
+    <!-- ================= HỆ THỐNG POPUPS ================= -->
 
-    <!-- POPUP 1: ĐIỂM DANH TUẦN -->
+    <!-- POPUP 1: ĐIỂM DANH -->
     <div class="overlay" id="pop-attendance">
         <div class="popup">
             <i class="fas fa-times close-popup" onclick="closePopup('pop-attendance')"></i>
-            <h3 style="text-align: center; color: var(--pink-dark);"><i class="fas fa-calendar-alt"></i> Điểm Danh Hàng Tuần</h3>
-            <p style="font-size: 12px; color: #777; text-align: center; margin-top: 5px;">Mỗi ngày nhận +5 Điểm & 1 Hạt Giống ngẫu nhiên!</p>
-            
+            <h3 style="font-weight:700; margin-bottom:5px;">Điểm Danh Hàng Tuần</h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">Mỗi ngày nhận +5 Điểm thưởng.</p>
             <div class="attendance-grid" id="grid-days"></div>
-            
-            <button class="btn-action btn-add" style="width: 100%; margin-top: 20px; padding: 12px;" onclick="claimDailyAttendance()">BẤM ĐIỂM DANH HÔM NAY</button>
+            <button class="btn-action" style="width:100%; margin-top:20px; padding:12px; background:var(--text-main); color:white;" onclick="claimDailyAttendance()">XÁC NHẬN ĐIỂM DANH HÔM NAY</button>
         </div>
     </div>
 
-    <!-- POPUP 2: KHU VƯỜN 6 Ô ĐẤT & HẠT GIỐNG CHỢ HOA -->
-    <div class="overlay" id="pop-garden">
-        <div class="popup" style="max-width: 440px; padding: 15px;">
-            <i class="fas fa-times close-popup" onclick="closePopup('pop-garden')"></i>
-            <h3 style="text-align: center; color: var(--pink-dark); margin-bottom: 10px;"><i class="fas fa-seedling"></i> Khu Vườn Hoa Của Bé</h3>
-            
-            <div class="garden-layout">
-                <!-- 6 ô đất bên trái -->
-                <div class="garden-grid">
-                    <div class="plot" onclick="clickPlot(0)"><span class="plot-emoji" id="p-emoji-0">🟫</span><div class="plot-timer" id="p-time-0"></div></div>
-                    <div class="plot" onclick="clickPlot(1)"><span class="plot-emoji" id="p-emoji-1">🟫</span><div class="plot-timer" id="p-time-1"></div></div>
-                    <div class="plot" onclick="clickPlot(2)"><span class="plot-emoji" id="p-emoji-2">🟫</span><div class="plot-timer" id="p-time-2"></div></div>
-                    <div class="plot" onclick="clickPlot(3)"><span class="plot-emoji" id="p-emoji-3">🟫</span><div class="plot-timer" id="p-time-3"></div></div>
-                    <div class="plot" onclick="clickPlot(4)"><span class="plot-emoji" id="p-emoji-4">🟫</span><div class="plot-timer" id="p-time-4"></div></div>
-                    <div class="plot" onclick="clickPlot(5)"><span class="plot-emoji" id="p-emoji-5">🟫</span><div class="plot-timer" id="p-time-5"></div></div>
-                </div>
-
-                <!-- Thanh chứa hạt giống bên phải -->
-                <div class="seed-sidebar" id="sidebar-seeds"></div>
-            </div>
-            <p style="font-size: 11px; color: #888; text-align: center; margin-top: 10px;">Click chọn hạt giống bên phải ➔ Click ô đất trống để gieo hạt nha!</p>
-        </div>
-    </div>
-
-    <!-- POPUP 3: CỬA HÀNG ĐỔI QUÀ -->
+    <!-- POPUP 2: TIỆM ĐỔI QUÀ -->
     <div class="overlay" id="pop-shop">
         <div class="popup">
             <i class="fas fa-times close-popup" onclick="closePopup('pop-shop')"></i>
-            <h3 style="text-align: center; color: var(--pink-dark); margin-bottom: 15px;"><i class="fas fa-store"></i> Tiệm Đổi Quà Tặng</h3>
+            <h3 style="font-weight:700; margin-bottom:15px;">Tiệm Đổi Quà Tặng</h3>
             <div class="list-group" id="list-shop-items"></div>
         </div>
     </div>
 
+    <!-- POPUP BẢNG ĐIỀU KHIỂN CỦA QUẢN TRỊ VIÊN (CHỈ HIỆN KHI NHẬP ĐÚNG MK) -->
+    <div class="overlay" id="pop-admin-panel">
+        <div class="popup" style="max-width:480px;">
+            <i class="fas fa-times close-popup" onclick="closePopup('pop-admin-panel')"></i>
+            <h3 style="font-weight:700; margin-bottom:15px;">Bảng Điều Phối Điểm Số</h3>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                <button id="tab-add" style="font-weight:700; background:none; border:none; cursor:pointer; padding:5px 10px;" onclick="switchAdminTab('add')">BẢNG CỘNG ĐIỂM</button>
+                <button id="tab-sub" style="font-weight:700; background:none; border:none; cursor:pointer; padding:5px 10px; color:var(--text-muted);" onclick="switchAdminTab('sub')">BẢNG TRỪ ĐIỂM</button>
+            </div>
 
-    <!-- ================= XỬ LÝ DỮ LIỆU ĐỒNG BỘ QUA FIREBASE ================= -->
+            <div id="admin-add-list" class="list-group"></div>
+            <div id="admin-sub-list" class="list-group" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- ================= SCRIPT XỬ LÝ DATABASE ================= -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, onValue, set, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // Khởi tạo Firebase cấu hình theo tên ứng dụng của bạn
         const firebaseConfig = {
             apiKey: "AIzaSyCJip89os02VXHsbdFoad3o_S7QpX0ce6Y",
             databaseURL: "https://qwerty-40818-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -223,46 +200,45 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // --- CƠ SỞ DỮ LIỆU CẤU HÌNH ĐIỂM + CỬA HÀNG THEO YÊU CẦU ---
-        const plusMissions = [
-            { text: "Chúc buổi sáng/ buổi tối", pts: 10 },
-            { text: "Ăn đủ 3 bữa", pts: 10 },
+        // --- CẤU HÌNH DỮ LIỆU ĐIỂM THEO DANH SÁCH KHÔNG TRẨU ---
+        const plusActions = [
+            { text: "Chúc buổi sáng / buổi tối", pts: 10 },
+            { text: "Ăn uống đủ 3 bữa", pts: 10 },
             { text: "Nghe lời", pts: 5 },
-            { text: "Ngoan", pts: 5 },
-            { text: "Ngày không bị trừ điểm nào", pts: 30 },
-            { text: "Tinh tế", pts: 5 },
-            { text: "Nói yêu tuôi (Giới hạn 1 lần/ngày)", pts: 10 },
-            { text: "Khi giận mà nhắn tin", pts: 5, desc: "1 tin nhắn" },
-            { text: "Gửi ảnh hàng ngày", pts: 5, desc: "1 ảnh" },
-            { text: "Gửi video tiktok", pts: 0.1, desc: "1 video" },
-            { text: "Gửi ảnh bụng >>", pts: 30 }
+            { text: "Ngoan ngoãn", pts: 5 },
+            { text: "Ngày hoàn hảo không trừ điểm", pts: 30 },
+            { text: "Hành động tinh tế", pts: 5 },
+            { text: "Nói yêu thương (Tối đa 1 lần/ngày)", pts: 10 },
+            { text: "Nhắn tin tương tác khi đang giận", pts: 5, desc: "1 tin" },
+            { text: "Gửi ảnh cập nhật hàng ngày", pts: 5, desc: "1 ảnh" },
+            { text: "Chia sẻ video thú vị", pts: 0.1, desc: "1 video" },
+            { text: "Gửi ảnh fit check/vóc dáng", pts: 30 }
         ];
 
-        const minusMissions = [
+        const minusActions = [
             { text: "Nói dối", pts: -50 },
-            { text: "Làm bực", pts: -20 },
-            { text: "Không nghe lời", pts: -10 },
-            { text: "Tim ảnh gái", pts: -20 },
-            { text: "Ngủ muộn", pts: -50 },
-            { text: "Thái độ", pts: -10 },
+            { text: "Làm bực bội", pts: -20 },
+            { text: "Không nghe lời nhắc nhở", pts: -10 },
+            { text: "Tương tác ảnh người khác giới", pts: -20 },
+            { text: "Thức khuya ngủ muộn", pts: -50 },
+            { text: "Thái độ không tốt", pts: -10 },
             { text: "Làm khó chịu", pts: -20 },
-            { text: "Đang giận mà không nhắn", pts: -100 },
-            { text: "Làm tuôi giận", pts: -100 }
+            { text: "Đang giận dỗi nhưng giữ im lặng", pts: -100 },
+            { text: "Vô cớ làm giận", pts: -100 }
         ];
 
-        const shopGifts = [
-            { text: "Thẻ miễn trừ tội lầm", cost: 5000 },
-            { text: "Thẻ giảm nhẹ tội lầm", cost: 2000 },
-            { text: "Thẻ x2 điểm trong 24 giờ", cost: 3500 },
-            { text: "Đổi 1 tấm ảnh bí mật", cost: 50000 },
-            { text: "Đổi 1 tin nhắn thoại Voice", cost: 100000 },
-            { text: "Thẻ nói thật (Bắt buộc trả lời)", cost: 5000 },
-            { text: "Thẻ yêu cầu làm việc gì đó", cost: 200000 }
+        const shopItems = [
+            { text: "Thẻ miễn trừ lỗi lầm", cost: 5000 },
+            { text: "Thẻ giảm nhẹ hình phạt", cost: 2000 },
+            { text: "Thẻ nhân đôi điểm (24 giờ)", cost: 3500 },
+            { text: "Yêu cầu gửi 1 hình ảnh bí mật", cost: 50000 },
+            { text: "Yêu cầu gửi 1 tin nhắn thoại Voice", cost: 100000 },
+            { text: "Thẻ câu hỏi bắt buộc nói thật", cost: 5000 },
+            { text: "Thẻ yêu cầu thực hiện 1 việc bất kỳ", cost: 200000 }
         ];
 
-        // Dữ liệu 6 loại hoa theo yêu cầu (Thời gian tính bằng giây để test nhanh)
         const flowersCatalog = {
-            rose: { name: "Hoa Hồng", buy: 5, sell: 10, time: 10, emoji: "🌹" }, 
+            rose: { name: "Hoa Hồng", buy: 5, sell: 10, time: 10, emoji: "🌹" },
             sunflower: { name: "Hướng Dương", buy: 10, sell: 20, time: 20, emoji: "🌻" },
             tulip: { name: "Hoa Tulip", buy: 20, sell: 45, time: 40, emoji: "🌷" },
             lavender: { name: "Oải Hương", buy: 50, sell: 120, time: 60, emoji: "🪻" },
@@ -270,34 +246,29 @@
             lotus: { name: "Hoa Sen", buy: 200, sell: 550, time: 120, emoji: "🪷" }
         };
 
-        // Biến cục bộ
         let currentScore = 0;
         let selectedSeedKey = null;
         let currentStreak = 0;
         let lastAttendanceDate = "";
-        let localPlots = Array(6).fill({ status: 'empty', plantKey: '', timeEnd: 0, stage: 1 });
-        let currentActiveRole = 'girl'; // Mặc định khi mở lên là màn hình bạn Nữ
+        let localPlots = Array(6).fill({ status: 'empty', plantKey: '', timeEnd: 0 });
 
-        // --- ⏳ ĐỢI HIỆU ỨNG LOADING CUTE ---
+        // --- ĐỢI LOADING ---
         window.addEventListener('load', () => {
             setTimeout(() => {
-                document.getElementById('loading-screen').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('loading-screen').style.display = 'none';
-                    document.getElementById('main-app').style.display = 'block';
-                }, 500);
-            }, 1500);
+                document.getElementById('loading-screen').style.display = 'none';
+                document.getElementById('main-app').style.display = 'block';
+            }, 1000);
         });
 
-        // --- ĐỒNG BỘ DỮ LIỆU TỪ FIREBASE REALTIME ---
+        // --- LISTENERS ĐỒNG BỘ REALTIME ---
         onValue(ref(db, 'score'), (snapshot) => {
             currentScore = snapshot.val() || 0;
-            document.getElementById('total-score').innerText = formatScore(currentScore);
+            document.getElementById('total-score').innerText = Number(currentScore).toFixed(1).replace('.0', '');
         });
 
         onValue(ref(db, 'streak'), (snapshot) => {
             currentStreak = snapshot.val() || 0;
-            document.getElementById('streak-text').innerText = `🔥 Chuỗi đăng nhập ngày: ${currentStreak} ngày`;
+            document.getElementById('streak-text').innerText = `Chuỗi đăng nhập: ${currentStreak} ngày`;
         });
 
         onValue(ref(db, 'history'), (snapshot) => {
@@ -312,7 +283,7 @@
                     logBox.appendChild(div);
                 });
             } else {
-                logBox.innerHTML = '<div class="history-item">Chưa có lịch sử hoạt động nào.</div>';
+                logBox.innerHTML = '<div class="history-item">Không có lịch sử biến động.</div>';
             }
         });
 
@@ -322,138 +293,106 @@
             renderGardenGrid();
         });
 
-        function formatScore(num) {
-            return Number(num).toFixed(1).replace('.0', '');
-        }
-
-        // --- KHỞI TẠO DANH SÁCH GIAO DIỆN ---
-        function initAppLists() {
-            const plusContainer = document.getElementById('list-plus-actions');
-            plusContainer.innerHTML = plusMissions.map((m, idx) => `
+        // --- KHỞI TẠO INTERFACE ---
+        function initApp() {
+            document.getElementById('admin-add-list').innerHTML = plusActions.map(m => `
                 <div class="item-card">
                     <div class="item-info">
                         <span class="item-title">${m.text}</span>
                         <span class="item-val val-plus">+${m.pts}đ ${m.desc ? `(${m.desc})` : ''}</span>
                     </div>
-                    <button class="btn-action btn-add" onclick="modifyPoints(${m.pts}, '${m.text}')">Cộng</button>
+                    <button class="btn-action" onclick="modifyPoints(${m.pts}, '${m.text}')">Cộng</button>
                 </div>
             `).join('');
 
-            const minusContainer = document.getElementById('list-minus-actions');
-            minusContainer.innerHTML = minusMissions.map((m, idx) => `
+            document.getElementById('admin-sub-list').innerHTML = minusActions.map(m => `
                 <div class="item-card">
                     <div class="item-info">
                         <span class="item-title">${m.text}</span>
                         <span class="item-val val-minus">${m.pts}đ</span>
                     </div>
-                    <button class="btn-action btn-buy" style="background:#e63946; color:white;" onclick="modifyPoints(${m.pts}, '${m.text}')">Trừ</button>
+                    <button class="btn-action" style="color:#c62828; border-color:#c62828;" onclick="modifyPoints(${m.pts}, '${m.text}')">Trừ</button>
                 </div>
             `).join('');
 
-            const shopContainer = document.getElementById('list-shop-items');
-            shopContainer.innerHTML = shopGifts.map((g, idx) => `
+            document.getElementById('list-shop-items').innerHTML = shopItems.map(g => `
                 <div class="item-card">
                     <div class="item-info">
                         <span class="item-title">${g.text}</span>
-                        <span class="item-val" style="color:#f4a261;">Giá: ${g.cost} điểm</span>
+                        <span class="item-val" style="color:var(--text-muted);">Chi phí: ${g.cost}đ</span>
                     </div>
-                    <button class="btn-action btn-buy" onclick="redeemGift(${g.cost}, '${g.text}')">Đỏi</button>
+                    <button class="btn-action" onclick="redeemGift(${g.cost}, '${g.text}')">Đổi quà</button>
                 </div>
             `).join('');
 
-            const sidebar = document.getElementById('sidebar-seeds');
-            sidebar.innerHTML = Object.keys(flowersCatalog).map(key => {
+            document.getElementById('sidebar-seeds').innerHTML = Object.keys(flowersCatalog).map(key => {
                 const f = flowersCatalog[key];
                 return `
                     <div class="seed-item" id="seed-${key}" onclick="selectSeed('${key}')">
-                        <span style="font-size:20px;">${f.emoji}</span>
+                        <span style="font-size:18px;">${f.emoji}</span>
                         <div style="margin-top:2px;">${f.name}</div>
-                        <div style="color:var(--pink-dark); font-size:10px;">Mua: ${f.buy}đ</div>
+                        <div style="color:var(--text-muted); font-size:10px;">${f.buy}đ</div>
                     </div>
                 `;
             }).join('');
 
-            const gridDays = document.getElementById('grid-days');
-            gridDays.innerHTML = Array.from({ length: 7 }).map((_, i) => `
-                <div class="day-box" id="day-${i+1}">
-                    <span>Thứ ${i+2 === 8 ? 'CN' : i+2}</span>
-                    <span style="font-size:16px;">🎁</span>
-                </div>
+            document.getElementById('grid-days').innerHTML = Array.from({ length: 7 }).map((_, i) => `
+                <div class="day-box" id="day-${i+1}">Thứ ${i+2 === 8 ? 'CN' : i+2}</div>
             `).join('');
         }
-        initAppLists();
+        initApp();
 
-        // --- CÁC HÀM XỬ LÝ CHỨC NĂNG CÓ MẬT KHẨU ---
-        window.switchRole = function(role) {
-            // Nếu bấm chọn sang tab Nữ, bắt buộc hỏi mật khẩu bảo mật
-            if (role === 'girl') {
-                const passwordInput = prompt("Vui lòng nhập mật khẩu Web Bạn Nữ để tiếp tục:");
-                if (passwordInput !== "67890") {
-                    alert("Mật khẩu sai rồi! Bạn không có quyền truy cập vào khu vườn của Nữ đâu nha 🤫");
-                    // Giữ nguyên trạng thái ở tab Nam, không cho chuyển
-                    document.getElementById('btn-role-girl').classList.remove('active');
-                    document.getElementById('btn-role-boy').classList.add('active');
-                    document.getElementById('panel-girl').classList.remove('active');
-                    document.getElementById('panel-boy').classList.add('active');
-                    return;
-                }
+        // --- BẢO MẬT & QUẢN TRỊ ---
+        window.accessAdminPanel = function() {
+            const code = prompt("Vui lòng nhập mã bảo mật cấp quyền quản trị:");
+            if (code === "67890") {
+                openPopup('pop-admin-panel');
+            } else {
+                alert("Mã xác thực không hợp lệ.");
             }
-
-            // Nếu nhập đúng mật khẩu hoặc chuyển sang tab Nam thì xử lý bình thường
-            currentActiveRole = role;
-            document.getElementById('btn-role-girl').classList.toggle('active', role === 'girl');
-            document.getElementById('btn-role-boy').classList.toggle('active', role === 'boy');
-            document.getElementById('panel-girl').classList.toggle('active', role === 'girl');
-            document.getElementById('panel-boy').classList.toggle('active', role === 'boy');
         };
 
         window.switchAdminTab = function(type) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-            document.getElementById('admin-add').style.display = type === 'add' ? 'block' : 'none';
-            document.getElementById('admin-sub').style.display = type === 'sub' ? 'block' : 'none';
+            document.getElementById('admin-add-list').style.display = type === 'add' ? 'flex' : 'none';
+            document.getElementById('admin-sub-list').style.display = type === 'sub' ? 'flex' : 'none';
+            document.getElementById('tab-add').style.color = type === 'add' ? 'var(--text-main)' : 'var(--text-muted)';
+            document.getElementById('tab-sub').style.color = type === 'sub' ? 'var(--text-main)' : 'var(--text-muted)';
         };
 
         window.openPopup = function(id) { document.getElementById(id).style.display = 'flex'; };
         window.closePopup = function(id) { document.getElementById(id).style.display = 'none'; };
 
         window.modifyPoints = function(pts, text) {
-            const targetScore = currentScore + pts;
-            set(ref(db, 'score'), targetScore);
-            const symbol = pts > 0 ? `+${pts}` : `${pts}`;
-            push(ref(db, 'history'), `[${symbol}đ] Bạn Nam cập nhật: ${text}`);
+            set(ref(db, 'score'), currentScore + pts);
+            push(ref(db, 'history'), `[${pts > 0 ? `+${pts}` : pts}đ] Cập nhật điều phối: ${text}`);
         };
 
         window.redeemGift = function(cost, giftName) {
             if (currentScore < cost) {
-                alert("Úi! Số điểm tích lũy hiện tại không đủ để đổi món quà này rồi, tích thêm nha bé! 💖");
+                alert("Điểm số tích lũy hiện tại không đủ hành động.");
                 return;
             }
-            const targetScore = currentScore - cost;
-            set(ref(db, 'score'), targetScore);
-            push(ref(db, 'history'), `[-${cost}đ] Bạn Nữ đã đổi quà: ${giftName}`);
-            alert("Đã đổi điểm thành công, hãy cap màn hình gửi cho người ấy nhé! ✨");
+            set(ref(db, 'score'), currentScore - cost);
+            push(ref(db, 'history'), `[-${cost}đ] Đã thực hiện đổi: ${giftName}`);
+            alert("Đã đổi điểm thành công, hãy cap màn hình gửi cho người ấy nhé!");
         };
 
         window.claimDailyAttendance = function() {
             const todayStr = new Date().toDateString();
             if (lastAttendanceDate === todayStr) {
-                alert("Hôm nay bạn đã điểm danh rồi, hãy quay lại vào ngày mai nhé! 🥰");
+                alert("Hành động điểm danh hôm nay đã được thực hiện.");
                 return;
             }
             lastAttendanceDate = todayStr;
             const newStreak = currentStreak + 1;
             set(ref(db, 'streak'), newStreak);
+            set(ref(db, 'score'), currentScore + 5);
             
-            const targetScore = currentScore + 5;
-            set(ref(db, 'score'), targetScore);
-            
-            const currentDayIndex = (newStreak - 1) % 7 + 1;
-            document.getElementById(`day-${currentDayIndex}`).classList.add('checked');
-            document.getElementById(`day-${currentDayIndex}`).innerHTML += `<span style="font-size:10px; color:green;">✔️ Xong</span>`;
+            const dayIdx = (newStreak - 1) % 7 + 1;
+            document.getElementById(`day-${dayIdx}`).classList.add('checked');
 
-            push(ref(db, 'history'), `[+5đ] Bạn Nữ điểm danh hàng ngày thành công! (Chuỗi ${newStreak} ngày) ☀️`);
-            alert(`Điểm danh thành công! Nhận được +5 Điểm thưởng và Gieo mầm năng lượng mới! 🎉`);
+            push(ref(db, 'history'), `[+5đ] Điểm danh hệ thống thành công (Chuỗi ${newStreak} ngày)`);
+            alert("Xác nhận điểm danh thành công! (+5đ)");
         };
 
         window.selectSeed = function(key) {
@@ -469,53 +408,46 @@
         window.clickPlot = function(index) {
             let plot = localPlots[index];
 
-            if (plot.status === 'empty') {
+            if (!plot || plot.status === 'empty') {
                 if (!selectedSeedKey) {
-                    alert("Hãy nhấn chọn 1 loại hạt giống ở thanh dọc bên phải trước khi gieo nha!");
+                    alert("Vui lòng chọn loại hạt giống ở thanh bên phải trước.");
                     return;
                 }
                 const flower = flowersCatalog[selectedSeedKey];
                 if (currentScore < flower.buy) {
-                    alert("Số điểm của bạn không đủ để mua hạt giống hoa này rồi!");
+                    alert("Điểm tích lũy không đủ.");
                     return;
                 }
 
-                const targetScore = currentScore - flower.buy;
-                set(ref(db, 'score'), targetScore);
-
-                plot = {
+                set(ref(db, 'score'), currentScore - flower.buy);
+                localPlots[index] = {
                     status: 'growing',
                     plantKey: selectedSeedKey,
-                    timeEnd: Date.now() + (flower.time * 1000),
-                    stage: 1
+                    timeEnd: Date.now() + (flower.time * 1000)
                 };
-                localPlots[index] = plot;
                 set(ref(db, 'plots'), localPlots);
-                push(ref(db, 'history'), `[-${flower.buy}đ] Gieo mầm hạt giống hạt ${flower.name} vào ô đất số ${index + 1} 🌱`);
+                push(ref(db, 'history'), `[-${flower.buy}đ] Gieo trồng hạt giống ${flower.name}`);
                 
                 selectedSeedKey = null;
                 document.querySelectorAll('.seed-item').forEach(el => el.classList.remove('selected'));
             } 
             else if (plot.status === 'growing') {
-                const now = Date.now();
-                if (now >= plot.timeEnd) {
+                if (Date.now() >= plot.timeEnd) {
                     plot.status = 'harvest';
                     localPlots[index] = plot;
                     set(ref(db, 'plots'), localPlots);
-                    alert("Oa! Cây hoa đã nở rộ, hãy nhấn vào một lần nữa để thu hoạch điểm ngọt ngào nhé! 🌹");
+                    alert("Cây trồng đã trưởng thành. Nhấn lần nữa để thu hoạch.");
                 } else {
-                    alert("Cây vẫn đang trong quá trình lớn mầm, hãy kiên nhẫn đợi thêm chút nha! 💦");
+                    alert("Cây trồng đang trong giai đoạn phát triển.");
                 }
             } 
             else if (plot.status === 'harvest') {
                 const flower = flowersCatalog[plot.plantKey];
-                const targetScore = currentScore + flower.sell;
-                set(ref(db, 'score'), targetScore);
+                set(ref(db, 'score'), currentScore + flower.sell);
+                push(ref(db, 'history'), `[+${flower.sell}đ] Thu hoạch sản lượng từ ${flower.name}`);
+                alert(`Thu hoạch thành công! (+${flower.sell}đ)`);
 
-                push(ref(db, 'history'), `[+${flower.sell}đ] Thu hoạch đóa hoa thành công từ ô đất số ${index + 1} 🎉`);
-                alert(`Chúc mừng bé! Thu hoạch thành công đóa ${flower.name} xinh tươi và nhận về +${flower.sell} điểm!`);
-
-                localPlots[index] = { status: 'empty', plantKey: '', timeEnd: 0, stage: 1 };
+                localPlots[index] = { status: 'empty', plantKey: '', timeEnd: 0 };
                 set(ref(db, 'plots'), localPlots);
             }
         };
@@ -523,44 +455,32 @@
         function renderGardenGrid() {
             const now = Date.now();
             for (let i = 0; i < 6; i++) {
-                const plot = localPlots[i];
+                const plot = localPlots[i] || { status: 'empty' };
                 const emojiEl = document.getElementById(`p-emoji-${i}`);
                 const timerEl = document.getElementById(`p-time-${i}`);
 
                 if (plot.status === 'empty') {
-                    emojiEl.innerText = "🟫";
+                    emojiEl.innerText = "◼️";
                     timerEl.style.display = 'none';
                 } else {
                     const flower = flowersCatalog[plot.plantKey];
                     const timeLeft = Math.max(0, Math.round((plot.timeEnd - now) / 1000));
 
                     if (timeLeft > 0) {
-                        emojiEl.innerText = timeLeft > (flower.time / 2) ? "🌱" : "🌿";
+                        emojiEl.innerText = "🌱";
                         timerEl.style.display = 'block';
                         timerEl.innerText = `${timeLeft}s`;
                     } else {
                         emojiEl.innerText = flower.emoji;
                         timerEl.style.display = 'block';
-                        timerEl.innerText = "Hái 🎁";
-                        timerEl.style.background = '#4caf50';
+                        timerEl.innerText = "Thu hoạch";
+                        timerEl.style.background = "#2e7d32";
                     }
                 }
             }
         }
 
         setInterval(renderGardenGrid, 1000);
-
-        const audio = document.getElementById('bg-audio');
-        const musicIcon = document.getElementById('music-icon');
-        window.toggleMusic = function() {
-            if (audio.paused) {
-                audio.play();
-                musicIcon.className = "fas fa-heartbeat";
-            } else {
-                audio.pause();
-                musicIcon.className = "fas fa-music";
-            }
-        };
     </script>
 </body>
 </html>
