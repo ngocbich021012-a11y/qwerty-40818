@@ -120,13 +120,11 @@
 
     <div id="toast-container"></div>
 
-    <!-- EFFECT LOADING GIỮA CÁC CHỨC NĂNG -->
     <div id="inner-loading">
         <div class="spinner"></div>
         <div class="loading-text">CHỜ XÍU NHA...</div>
     </div>
 
-    <!-- MAIN APP FRAME -->
     <div class="app-container" id="main-app">
         <h1>BẢNG ĐIỀU PHỐI ĐIỂM</h1>
 
@@ -135,7 +133,6 @@
             <div class="streak-info" id="streak-text">Chuỗi tích lũy: 0 ngày</div>
         </div>
 
-        <!-- 4 Ô CHỨC NĂNG TRANG CHỦ -->
         <div class="grid-menu-4">
             <div class="menu-item-card" onclick="triggerPopup('pop-attendance')">
                 <i class="fas fa-calendar-check" style="color: #ff8fab;"></i>
@@ -162,11 +159,9 @@
             </div>
         </div>
 
-        <!-- NÚT BẤM QUẢN TRỊ VIÊN -->
         <button class="admin-secret-btn" onclick="triggerPopup('pop-auth')">[ Quản trị viên ]</button>
     </div>
 
-    <!-- POPUP 1: ĐIỂM DANH HÀNG TUẦN -->
     <div class="overlay" id="pop-attendance">
         <div class="popup">
             <i class="fas fa-times close-popup" onclick="closePopup('pop-attendance')"></i>
@@ -177,7 +172,6 @@
         </div>
     </div>
 
-    <!-- POPUP 2: NÔNG TRẠI KHU VƯỜN ĐẤT THẬT -->
     <div class="overlay" id="pop-garden">
         <div class="popup">
             <i class="fas fa-times close-popup" onclick="closePopup('pop-garden')"></i>
@@ -197,7 +191,6 @@
         </div>
     </div>
 
-    <!-- POPUP 3: TIỆM ĐỔI QUÀ CUTE -->
     <div class="overlay" id="pop-shop">
         <div class="popup">
             <i class="fas fa-times close-popup" onclick="closePopup('pop-shop')"></i>
@@ -206,7 +199,6 @@
         </div>
     </div>
 
-    <!-- POPUP 4: NHẬT KÝ HỆ THỐNG -->
     <div class="overlay" id="pop-logs">
         <div class="popup">
             <i class="fas fa-times close-popup" onclick="closePopup('pop-logs')"></i>
@@ -217,7 +209,6 @@
         </div>
     </div>
 
-    <!-- POPUP PHỤ: XÁC THỰC MẬT KHẨU QUẢN TRỊ VIÊN -->
     <div class="overlay" id="pop-auth">
         <div class="popup" style="max-width: 355px; text-align: center;">
             <i class="fas fa-times close-popup" onclick="closePopup('pop-auth')"></i>
@@ -227,14 +218,12 @@
         </div>
     </div>
 
-    <!-- POPUP BẢNG ĐIỀU PHỐI ĐIỂM CỦA ADMIN -->
     <div class="overlay" id="pop-admin-panel">
         <div class="popup">
             <i class="fas fa-times close-popup" onclick="closePopup('pop-admin-panel')"></i>
             <div class="tabs-header">
                 <button id="tab-add" class="tab-link active" onclick="switchAdminTab('add')">CỘNG ĐIỂM</button>
                 <button id="tab-sub" class="tab-link" onclick="switchAdminTab('sub')">TRỪ ĐIỂM</button>
-                <!-- NÚT RESET TOÀN DIỆN -->
                 <button class="btn-reset-tab" onclick="resetAllPoints()">🔄 RESET ĐIỂM</button>
             </div>
             <div id="admin-add-list" class="list-group"></div>
@@ -242,7 +231,6 @@
         </div>
     </div>
 
-    <!-- ================= CORE CODE LOGIC SYSTEM ================= -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, onValue, set, push, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -305,7 +293,7 @@
         let selectedSeedKey = null;
         let currentStreak = 0;
         let firebaseAttendance = {};
-        let localPlots = Array(6).fill({ status: 'empty', plantKey: '', timeEnd: 0 });
+        let localPlots = Array(6).fill().map(() => ({ status: 'empty', plantKey: '', timeEnd: 0 }));
 
         window.showToast = function(msg) {
             const container = document.getElementById('toast-container');
@@ -360,7 +348,11 @@
 
         onValue(ref(db, 'plots'), (snapshot) => {
             const data = snapshot.val();
-            if (data) localPlots = data;
+            if (data && Array.isArray(data)) {
+                localPlots = data;
+            } else {
+                localPlots = Array(6).fill().map(() => ({ status: 'empty', plantKey: '', timeEnd: 0 }));
+            }
             renderGardenGrid();
         });
 
@@ -399,7 +391,7 @@
                 const f = flowersCatalog[key];
                 return `
                     <div class="seed-item" id="seed-${key}" onclick="selectSeed('${key}')">
-                        <span style="font-size:22px; margin-bottom:4px;">🤎</span>
+                        <span style="font-size:22px; margin-bottom:4px;">${f.emoji}</span>
                         <div style="font-size:12px; color:var(--text-main); font-weight:800;">${f.name}</div>
                         <div style="color:var(--text-muted); font-size:10px; margin-top:2px;">Mua: ${f.buy}đ</div>
                     </div>
@@ -486,7 +478,8 @@
 
         function renderAttendanceGrid() {
             for (let i = 1; i <= 7; i++) {
-                document.getElementById(`day-${i}`).classList.remove('checked');
+                const box = document.getElementById(`day-${i}`);
+                if (box) box.classList.remove('checked');
             }
             Object.values(firebaseAttendance).forEach(dayIdx => {
                 const box = document.getElementById(`day-${dayIdx}`);
@@ -505,9 +498,10 @@
         };
 
         window.clickPlot = function(index) {
-            let plot = localPlots[index];
+            let plot = localPlots[index] || { status: 'empty' };
+            const now = Date.now();
 
-            if (!plot || plot.status === 'empty') {
+            if (plot.status === 'empty') {
                 if (!selectedSeedKey) {
                     showToast("🌱 Hãy chọn 1 túi hạt giống ở phía dưới trước.");
                     return;
@@ -522,7 +516,7 @@
                 localPlots[index] = {
                     status: 'growing',
                     plantKey: selectedSeedKey,
-                    timeEnd: Date.now() + (flower.time * 1000)
+                    timeEnd: now + (flower.time * 1000)
                 };
                 set(ref(db, 'plots'), localPlots);
                 push(ref(db, 'history'), `[-${flower.buy}đ] Tiến hành gieo mầm ${flower.name}`);
@@ -532,28 +526,31 @@
                 document.querySelectorAll('.seed-item').forEach(el => el.classList.remove('selected'));
             } 
             else if (plot.status === 'growing') {
-                showToast("⏳ Cây vẫn đang trong quá trình lớn, hãy kiên nhẫn đợi thêm nha.");
-            } 
-            else if (plot.status === 'harvest') {
-                const flower = flowersCatalog[plot.plantKey];
-                set(ref(db, 'score'), currentScore + flower.sell);
-                push(ref(db, 'history'), `[+${flower.sell}đ] Thu hoạch nông sản ${flower.name}`);
-                showToast(`🧺 Thu hoạch hoàn tất! Bạn nhận được (+${flower.sell}đ)`);
+                // Kiểm tra thực tế xem tại thời điểm click cây đã chín chưa
+                if (now >= plot.timeEnd) {
+                    const flower = flowersCatalog[plot.plantKey];
+                    set(ref(db, 'score'), currentScore + flower.sell);
+                    push(ref(db, 'history'), `[+${flower.sell}đ] Thu hoạch nông sản ${flower.name}`);
+                    showToast(`🧺 Thu hoạch hoàn tất! Bạn nhận được (+${flower.sell}đ)`);
 
-                localPlots[index] = { status: 'empty', plantKey: '', timeEnd: 0 };
-                set(ref(db, 'plots'), localPlots);
+                    localPlots[index] = { status: 'empty', plantKey: '', timeEnd: 0 };
+                    set(ref(db, 'plots'), localPlots);
+                } else {
+                    showToast("⏳ Cây vẫn đang trong quá trình lớn, hãy kiên nhẫn đợi thêm nha.");
+                }
             }
         };
 
         function renderGardenGrid() {
             const now = Date.now();
-            let needUpdateFirebase = false;
 
             for (let i = 0; i < 6; i++) {
                 const plot = localPlots[i] || { status: 'empty' };
                 const plotEl = document.getElementById(`plot-${i}`);
                 const emojiEl = document.getElementById(`p-emoji-${i}`);
                 const timerEl = document.getElementById(`p-time-${i}`);
+
+                if (!plotEl || !emojiEl || !timerEl) continue;
 
                 if (plot.status === 'empty') {
                     plotEl.className = "plot";
@@ -562,13 +559,9 @@
                 } else {
                     const flower = flowersCatalog[plot.plantKey];
                     const diff = plot.timeEnd - now;
-                    
-                    if (plot.status === 'growing' && diff <= 0) {
-                        localPlots[i].status = 'harvest';
-                        needUpdateFirebase = true;
-                    }
 
-                    if (diff > 0 && plot.status === 'growing') {
+                    // Chỉ xử lý giao diện thuần túy, KHÔNG SET dữ liệu ngược về Firebase tại đây để tránh loop vô hạn
+                    if (diff > 0) {
                         plotEl.className = "plot growing-state";
                         emojiEl.innerText = "🌱";
                         timerEl.className = "plot-timer";
@@ -586,10 +579,6 @@
                         timerEl.innerText = "Thu hoạch";
                     }
                 }
-            }
-
-            if (needUpdateFirebase) {
-                set(ref(db, 'plots'), localPlots);
             }
         }
 
