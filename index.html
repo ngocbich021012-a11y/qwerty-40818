@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Tích Điểm </title>
+    <title> Tích Điểm</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -181,7 +181,7 @@
     <div class="overlay" id="pop-garden">
         <div class="popup">
             <i class="fas fa-times close-popup" onclick="closePopup('pop-garden')"></i>
-            <h3 style="font-size:16px; font-weight:800; text-align: center;">🏡 Khu Vườn Ngọt Ngào 🏡</h3>
+            <h3 style="font-size:16px; font-weight:800; text-align: center;">🏡 Khu Vườn Ngọc Ngào 🏡</h3>
             <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 4px;">Chọn hạt giống phía dưới và chạm vào ô đất màu nâu để trồng cây.</p>
             <div class="garden-layout">
                 <div class="garden-grid">
@@ -234,7 +234,7 @@
             <div class="tabs-header">
                 <button id="tab-add" class="tab-link active" onclick="switchAdminTab('add')">CỘNG ĐIỂM</button>
                 <button id="tab-sub" class="tab-link" onclick="switchAdminTab('sub')">TRỪ ĐIỂM</button>
-                <!-- THÊM NÚT RESET ĐIỂM TẠI ĐÂY -->
+                <!-- NÚT RESET ĐIỂM & CHUỖI TÍCH LŨY -->
                 <button class="btn-reset-tab" onclick="resetAllPoints()">🔄 RESET ĐIỂM</button>
             </div>
             <div id="admin-add-list" class="list-group"></div>
@@ -265,7 +265,7 @@
             { text: "Hành động tinh tế", pts: 5 },
             { text: "Nói yêu thương (Tối đa 1 lần/ngày)", pts: 10 },
             { text: "Nhắn tin tương tác khi đang giận", pts: 5 },
-            { text: "Gửi ảnh cập nhật hàng ngày", pts: 5 },
+            { text: "Gửi ảnh cập nhật hàng daily", pts: 5 },
             { text: "Chia sẻ video thú vị", pts: 0.1 },
             { text: "Gửi ảnh fit check/vóc dáng", pts: 30 }
         ];
@@ -436,13 +436,14 @@
             showToast(`✅ Đã điều phối ${pts > 0 ? `+${pts}` : pts} điểm!`);
         };
 
-        // CHỨC NĂNG RESET ĐIỂM ĐÃ ĐƯỢC THÊM VÀO ĐÂY
+        // CẬP NHẬT: RESET ĐỒNG THỜI ĐIỂM SỐ VÀ CHUỖI TÍCH LŨY (STREAK)
         window.resetAllPoints = function() {
-            const confirmReset = confirm("⚠️ CẢNH BÁO QUAN TRỌNG:\nBạn có chắc chắn muốn đặt lại (Reset) toàn bộ điểm số hệ thống về 0 không? Thao tác này không thể hoàn tác!");
+            const confirmReset = confirm("⚠️ CẢNH BÁO QUAN TRỌNG:\nBạn có chắc chắn muốn đặt lại (Reset) TOÀN BỘ ĐIỂM SỐ và CHUỖI NGÀY TÍCH LŨY về 0 không? Thao tác này sẽ xóa sạch dữ liệu chuỗi ngày hiện tại!");
             if (confirmReset) {
                 set(ref(db, 'score'), 0);
-                push(ref(db, 'history'), `[Reset] QTV đã đặt lại toàn bộ điểm số về 0`);
-                showToast("🔄 Đã reset điểm số hệ thống về 0!");
+                set(ref(db, 'streak'), 0); // Reset chuỗi tích lũy về 0
+                push(ref(db, 'history'), `[Reset] QTV đã đặt lại toàn bộ điểm số và chuỗi tích lũy về 0`);
+                showToast("🔄 Đã reset điểm và chuỗi tích lũy về 0!");
             }
         };
 
