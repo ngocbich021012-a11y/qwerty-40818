@@ -37,107 +37,84 @@
         .loading-text { font-size: 16px; font-weight: 800; color: var(--pastel-pink-dark); letter-spacing: 2px; animation: blink 1.2s infinite ease-in-out; }
         @keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
-        /* --- FRAME CONTAINER CHÍNH --- */
-        .app-container { width: 100%; max-width: 500px; background: var(--bg-card); border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 30px; position: relative; display: none; border: 1px solid var(--border); }
+        /* --- APP CONTAINER --- */
+        .app-container { width: 100%; max-width: 500px; background: var(--bg-card); border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 30px; position: relative; display: none; border: 1px solid var(--border); overflow: hidden; }
         
-        h1 { text-align: center; font-size: 20px; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 25px; color: var(--text-main); }
+        h1 { text-align: center; font-size: 20px; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 20px; color: var(--text-main); }
         
         /* Dashboard điểm số */
-        .score-box { background: var(--pastel-pink); padding: 35px 20px; border-radius: var(--radius-md); text-align: center; margin-bottom: 25px; position: relative; }
-        .score-num { font-size: 64px; font-weight: 900; color: var(--text-main); letter-spacing: -2px; line-height: 1; margin-bottom: 12px; }
-        .streak-info { font-size: 13px; font-weight: 700; color: var(--text-main); background: var(--bg-card); padding: 6px 16px; border-radius: 30px; display: inline-block; }
+        .score-box { background: var(--pastel-pink); padding: 28px 20px; border-radius: var(--radius-md); text-align: center; margin-bottom: 25px; position: relative; }
+        .score-num { font-size: 54px; font-weight: 900; color: var(--text-main); letter-spacing: -2px; line-height: 1; margin-bottom: 10px; }
+        .streak-info { font-size: 12px; font-weight: 700; color: var(--text-main); background: var(--bg-card); padding: 6px 16px; border-radius: 30px; display: inline-block; }
 
-        /* Menu nhanh */
-        .main-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 30px; }
-        .action-card-btn { background: var(--bg-card); border: 1px solid var(--border); padding: 18px; border-radius: var(--radius-md); cursor: pointer; text-align: left; transition: all 0.2s ease; display: flex; align-items: center; gap: 14px; }
-        .action-card-btn:hover { background: var(--pastel-pink); border-color: var(--pastel-pink-dark); transform: translateY(-2px); }
-        .action-card-btn i { font-size: 22px; color: var(--text-main); }
-        .action-card-btn .btn-title { font-weight: 700; font-size: 14px; margin-bottom: 2px; }
-        .action-card-btn .btn-desc { font-size: 11px; color: var(--text-muted); }
+        /* --- 4 Ô CHỨC NĂNG DỄ THƯƠNG (TRANG CHỦ) --- */
+        .grid-menu-4 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 10px; }
+        .menu-item-card { background: #fffcfc; border: 2px solid var(--border); border-radius: var(--radius-md); padding: 25px 15px; text-align: center; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 4px 10px rgba(255, 179, 198, 0.05); }
+        .menu-item-card:hover { transform: translateY(-4px); border-color: var(--pastel-pink-dark); background: var(--pastel-pink); box-shadow: 0 10px 20px rgba(255, 179, 198, 0.2); }
+        .menu-item-card i { font-size: 32px; color: var(--text-main); }
+        .menu-item-card .card-title { font-weight: 800; font-size: 14px; color: var(--text-main); }
+        .menu-item-card .card-desc { font-size: 11px; color: var(--text-muted); line-height: 1.3; }
 
-        .section-title { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-main); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+        /* --- POPUP TOÀN MÀN HÌNH (CÓ NÚT X THOÁT RA) --- */
+        .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(43, 43, 43, 0.25); backdrop-filter: blur(5px); z-index: 1000; display: none; justify-content: center; align-items: center; padding: 15px; }
+        .popup { background: var(--bg-card); border-radius: var(--radius-lg); padding: 30px; width: 100%; max-width: 440px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.08); border: 1px solid var(--border); animation: popScale 0.25s ease-out; }
+        @keyframes popScale { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         
-        /* --- KHU VƯỜN 6 Ô THIẾT KẾ MỚI SIÊU ĐẸP --- */
-        .garden-layout { display: flex; gap: 15px; margin-bottom: 30px; background: #fffcfc; padding: 15px; border-radius: var(--radius-md); border: 1px solid var(--border); }
-        .garden-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; flex: 1; }
+        /* Dấu X Thoát để quay về trang chủ */
+        .close-popup { position: absolute; top: 22px; right: 22px; font-size: 18px; cursor: pointer; color: var(--text-muted); transition: 0.2s; width: 32px; height: 32px; display: flex; justify-content: center; align-items: center; border-radius: 50%; background: var(--bg-body); }
+        .close-popup:hover { color: var(--text-main); background: var(--pastel-pink); transform: rotate(90deg); }
         
-        /* Ô đất nung pastel xịn sò */
-        .plot { aspect-ratio: 1; background: #fceade; border-radius: var(--radius-sm); border: 2px solid #f3d1be; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: inset 0 4px 6px rgba(139, 94, 60, 0.05); }
-        .plot:hover { border-color: var(--pastel-pink-dark); transform: scale(1.04); box-shadow: 0 6px 15px rgba(255, 179, 198, 0.2); }
-        
-        /* Cây đang lớn sẽ đổi sang nền xanh nhẹ mượt mà */
+        /* --- GIAO DIỆN KHU VƯỜN --- */
+        .garden-layout { display: flex; gap: 12px; margin-top: 15px; background: #fffcfc; padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border); }
+        .garden-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; flex: 1; }
+        .plot { aspect-ratio: 1; background: #fceade; border-radius: var(--radius-sm); border: 2px solid #f3d1be; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; cursor: pointer; transition: all 0.2s; }
+        .plot:hover { border-color: var(--pastel-pink-dark); transform: scale(1.04); }
         .plot.growing-state { background: #eef9f0; border-color: #c8e6c9; }
-        /* Cây đã chín đổi sang nền hồng ngọt ngào sẵn sàng thu hoạch */
         .plot.harvest-state { background: var(--pastel-pink); border-color: var(--pastel-pink-dark); animation: pulseGlow 1.5s infinite ease-in-out; }
+        @keyframes pulseGlow { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+        .plot-emoji { font-size: 26px; }
+        .plot-timer { font-size: 9px; font-weight: 800; background: rgba(43, 43, 43, 0.85); color: white; padding: 2px 5px; border-radius: 20px; position: absolute; bottom: 5px; }
+        .plot-timer.ready { background: #2b2b2b; }
         
-        @keyframes pulseGlow { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); border-color: #ff8fab; } }
+        .seed-sidebar { width: 110px; background: var(--bg-card); border-radius: var(--radius-sm); padding: 6px; display: flex; flex-direction: column; gap: 6px; max-height: 190px; overflow-y: auto; border: 1px solid var(--border); }
+        .seed-item { background: var(--bg-body); border: 1px solid transparent; border-radius: 8px; padding: 8px 2px; display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: 700; cursor: pointer; text-align: center; }
+        .seed-item.selected { border-color: var(--pastel-pink-dark); background: var(--pastel-pink); }
 
-        .plot-emoji { font-size: 28px; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.06)); transition: transform 0.2s; }
-        .plot:active .plot-emoji { transform: scale(0.8); }
-
-        /* Khay đếm thời gian nhỏ nhắn tinh tế */
-        .plot-timer { font-size: 9px; font-weight: 800; background: rgba(43, 43, 43, 0.85); color: white; padding: 2px 6px; border-radius: 20px; position: absolute; bottom: 6px; backdrop-filter: blur(2px); letter-spacing: 0.3px; }
-        .plot-timer.ready { background: #2b2b2b; animation: bounce 0.6s infinite alternate; }
-        @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-2px); } }
-        
-        /* Thanh dọc hạt giống chỉn chu hơn */
-        .seed-sidebar { width: 120px; background: var(--bg-card); border-radius: var(--radius-sm); padding: 8px; display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; border: 1px solid var(--border); }
-        .seed-item { background: var(--bg-body); border: 1px solid transparent; border-radius: 10px; padding: 10px 4px; display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: 700; cursor: pointer; text-align: center; transition: all 0.2s ease; }
-        .seed-item:hover { background: #fff0f3; border-color: var(--pastel-pink); }
-        .seed-item.selected { border-color: var(--pastel-pink-dark); background: var(--pastel-pink); box-shadow: 0 4px 10px rgba(255, 179, 198, 0.3); }
-
-        /* --- LIST CARD CHI TIẾT --- */
-        .list-group { display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto; padding-right: 4px; }
-        .item-card { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); }
-        .item-info { display: flex; flex-direction: column; gap: 3px; max-width: 70%; }
-        .item-title { font-weight: 600; font-size: 14px; line-height: 1.3; }
-        .item-val { font-size: 12px; font-weight: 700; display: inline-block; width: fit-content; }
+        /* Các thành phần danh sách */
+        .list-group { display: flex; flex-direction: column; gap: 8px; max-height: 260px; overflow-y: auto; padding-right: 4px; margin-top: 15px; }
+        .item-card { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+        .item-info { display: flex; flex-direction: column; gap: 2px; max-width: 70%; }
+        .item-title { font-weight: 600; font-size: 13px; }
+        .item-val { font-size: 11px; font-weight: 700; }
         .val-plus { color: var(--accent-green); }
         .val-minus { color: var(--accent-red); }
 
-        .btn-action { padding: 8px 16px; border: 1px solid var(--text-main); border-radius: var(--radius-sm); font-weight: 700; font-size: 12px; cursor: pointer; background: var(--bg-card); color: var(--text-main); transition: all 0.2s ease; }
+        .btn-action { padding: 8px 14px; border: 1px solid var(--text-main); border-radius: var(--radius-sm); font-weight: 700; font-size: 11px; cursor: pointer; background: var(--bg-card); color: var(--text-main); transition: 0.2s; }
         .btn-action:hover { background: var(--text-main); color: var(--bg-card); }
-
-        /* --- LOG NHẬT KÝ --- */
-        .history-box { background: var(--bg-body); border-radius: var(--radius-md); padding: 20px; border: 1px solid var(--border); }
-        .history-title { font-size: 12px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
-        .history-list { max-height: 110px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
-        .history-item { padding: 8px 12px; background: var(--bg-card); border-radius: 8px; font-size: 12px; border: 1px solid var(--border); line-height: 1.4; }
-
-        /* --- POPUP MODAL --- */
-        .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(43, 43, 43, 0.2); backdrop-filter: blur(4px); z-index: 1000; display: none; justify-content: center; align-items: center; padding: 15px; }
-        .popup { background: var(--bg-card); border-radius: var(--radius-lg); padding: 28px; width: 100%; max-width: 420px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.06); border: 1px solid var(--border); }
-        .close-popup { position: absolute; top: 22px; right: 22px; font-size: 16px; cursor: pointer; color: var(--text-muted); transition: 0.2s; }
-        .close-popup:hover { color: var(--text-main); }
-        
-        /* Giao diện nhập mật khẩu xịn */
-        .pwd-input { width: 100%; padding: 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 16px; font-weight: 600; text-align: center; letter-spacing: 4px; margin-top: 15px; background: var(--bg-body); outline: none; }
-        .pwd-input:focus { border-color: var(--pastel-pink-dark); background: #fff; }
 
         /* Lưới điểm danh */
         .attendance-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 15px; }
-        .day-box { background: var(--bg-body); border-radius: var(--radius-sm); padding: 14px 6px; text-align: center; font-size: 12px; font-weight: 700; color: var(--text-muted); border: 1px solid var(--border); }
+        .day-box { background: var(--bg-body); border-radius: var(--radius-sm); padding: 12px 4px; text-align: center; font-size: 11px; font-weight: 700; color: var(--text-muted); border: 1px solid var(--border); }
         .day-box.checked { background: var(--pastel-green); color: var(--accent-green); border-color: #a5d6a7; }
 
-        .admin-secret-btn { position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); font-size: 11px; color: var(--text-muted); background: none; border: none; cursor: pointer; text-decoration: none; font-weight: 600; letter-spacing: 0.5px; }
-        .admin-secret-btn:hover { color: var(--pastel-pink-dark); }
-
-        .tabs-header { display: flex; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
-        .tab-link { font-size: 14px; font-weight: 800; background: none; border: none; cursor: pointer; color: var(--text-muted); padding-bottom: 4px; }
+        /* Mật khẩu ô nhập và tab quản trị */
+        .pwd-input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 15px; font-weight: 600; text-align: center; letter-spacing: 4px; margin-top: 15px; background: var(--bg-body); outline: none; }
+        .tabs-header { display: flex; gap: 15px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+        .tab-link { font-size: 13px; font-weight: 800; background: none; border: none; cursor: pointer; color: var(--text-muted); }
         .tab-link.active { color: var(--text-main); border-bottom: 2px solid var(--text-main); }
+        
+        .admin-secret-btn { position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); font-size: 11px; color: var(--text-muted); background: none; border: none; cursor: pointer; font-weight: 600; }
     </style>
 </head>
 <body>
 
-    <!-- 1. CUSTOM NOTIFICATION CONTAINER -->
     <div id="toast-container"></div>
 
-    <!-- 2. LOADING SCREEN -->
     <div id="loading-screen">
         <div class="loading-text">LOADINGGG...</div>
     </div>
 
-    <!-- 3. MAIN APP FRAME -->
+    <!-- MAIN APP FRAME -->
     <div class="app-container" id="main-app">
         <h1>BẢNG ĐIỀU PHỐI ĐIỂM</h1>
 
@@ -146,81 +123,100 @@
             <div class="streak-info" id="streak-text">Chuỗi tích lũy: 0 ngày</div>
         </div>
 
-        <div class="main-actions">
-            <button class="action-card-btn" onclick="openPopup('pop-attendance')">
-                <i class="fas fa-check-circle"></i>
-                <div>
-                    <div class="btn-title">Điểm Danh</div>
-                    <div class="btn-desc">Nhận thưởng mỗi ngày</div>
-                </div>
-            </button>
-            <button class="action-card-btn" onclick="openPopup('pop-shop')">
-                <i class="fas fa-shopping-bag"></i>
-                <div>
-                    <div class="btn-title">Tiệm Đổi Quà</div>
-                    <div class="btn-desc">Sử dụng điểm quy đổi</div>
-                </div>
-            </button>
-        </div>
-
-        <!-- KHU VƯỜN ĐÃ ĐƯỢC THIẾT KẾ ĐẸP HƠN -->
-        <div class="section-title"><i class="fas fa-seedling"></i> Khu vườn ngọt ngào của bạn</div>
-        <div class="garden-layout">
-            <div class="garden-grid">
-                <div class="plot" id="plot-0" onclick="clickPlot(0)"><span class="plot-emoji" id="p-emoji-0">🌱</span><div class="plot-timer" id="p-time-0" style="display:none;"></div></div>
-                <div class="plot" id="plot-1" onclick="clickPlot(1)"><span class="plot-emoji" id="p-emoji-1">🌱</span><div class="plot-timer" id="p-time-1" style="display:none;"></div></div>
-                <div class="plot" id="plot-2" onclick="clickPlot(2)"><span class="plot-emoji" id="p-emoji-2">🌱</span><div class="plot-timer" id="p-time-2" style="display:none;"></div></div>
-                <div class="plot" id="plot-3" onclick="clickPlot(3)"><span class="plot-emoji" id="p-emoji-3">🌱</span><div class="plot-timer" id="p-time-3" style="display:none;"></div></div>
-                <div class="plot" id="plot-4" onclick="clickPlot(4)"><span class="plot-emoji" id="p-emoji-4">🌱</span><div class="plot-timer" id="p-time-4" style="display:none;"></div></div>
-                <div class="plot" id="plot-5" onclick="clickPlot(5)"><span class="plot-emoji" id="p-emoji-5">🌱</span><div class="plot-timer" id="p-time-5" style="display:none;"></div></div>
+        <!-- 4 Ô CHỨC NĂNG TRANG CHỦ -->
+        <div class="grid-menu-4">
+            <div class="menu-item-card" onclick="openPopup('pop-attendance')">
+                <i class="fas fa-calendar-check" style="color: #ff8fab;"></i>
+                <div class="card-title">Điểm Danh</div>
+                <div class="card-desc">Tích lũy chuỗi ngày nhận thêm quà</div>
             </div>
-            <div class="seed-sidebar" id="sidebar-seeds"></div>
-        </div>
+            
+            <div class="menu-item-card" onclick="openPopup('pop-garden')">
+                <i class="fas fa-seedling" style="color: #a8dadc;"></i>
+                <div class="card-title">Khu Vườn</div>
+                <div class="card-desc">Gieo mầm hoa, thu hoạch điểm thưởng</div>
+            </div>
 
-        <div class="history-box">
-            <div class="history-title">Nhật ký hoạt động hệ thống</div>
-            <div class="history-list" id="history-logs">
-                <div class="history-item">Đang đồng bộ cơ sở dữ liệu...</div>
+            <div class="menu-item-card" onclick="openPopup('pop-shop')">
+                <i class="fas fa-gift" style="color: #ffd166;"></i>
+                <div class="card-title">Tiệm Đổi Quà</div>
+                <div class="card-desc">Sử dụng điểm đổi vật phẩm bí mật</div>
+            </div>
+
+            <div class="menu-item-card" onclick="openPopup('pop-logs')">
+                <i class="fas fa-history" style="color: #b5e2fa;"></i>
+                <div class="card-title">Nhật Ký</div>
+                <div class="card-desc">Theo dõi biến động điểm hệ thống</div>
             </div>
         </div>
 
         <button class="admin-secret-btn" onclick="openPopup('pop-auth')">[ Quản trị viên ]</button>
     </div>
 
-    <!-- ================= POPUP MODALS ================= -->
+    <!-- ================= CHỨC NĂNG POPUP CHI TIẾT (CÓ DẤU X THOÁT RA) ================= -->
 
-    <!-- POPUP: NHẬP MẬT KHẨU BẢO MẬT -->
-    <div class="overlay" id="pop-auth">
-        <div class="popup" style="max-width: 360px; text-align: center;">
-            <i class="fas fa-times close-popup" onclick="closePopup('pop-auth')"></i>
-            <h3 style="font-size:16px; font-weight:800; margin-bottom:6px;">Xác Thực Quyền QTV</h3>
-            <p style="font-size:12px; color:var(--text-muted);">Vui lòng nhập mã pin mã hóa để tiếp tục</p>
-            <input type="password" id="admin-password-input" class="pwd-input" placeholder="•••••" maxlength="8">
-            <button class="btn-action" style="width:100%; margin-top:15px; padding:12px; background:var(--text-main); color:white;" onclick="verifyAdminPassword()">XÁC NHẬN TRUY CẬP</button>
-        </div>
-    </div>
-
-    <!-- DIALOG ĐIỂM DANH -->
+    <!-- POPUP 1: ĐIỂM DANH HÀNG NGÀY -->
     <div class="overlay" id="pop-attendance">
         <div class="popup">
             <i class="fas fa-times close-popup" onclick="closePopup('pop-attendance')"></i>
-            <h3 style="font-size:16px; font-weight:800; margin-bottom:4px;">Điểm Danh Hàng Tuần</h3>
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Hệ thống tự động cộng +5 điểm thưởng.</p>
+            <h3 style="font-size:15px; font-weight:800;">Điểm Danh Hàng Tuần</h3>
+            <p style="font-size: 12px; color: var(--text-muted);">Mỗi ngày điểm danh nhận ngay +5 điểm.</p>
             <div class="attendance-grid" id="grid-days"></div>
-            <button class="btn-action" style="width:100%; margin-top:25px; padding:14px; background:var(--text-main); color:white;" onclick="claimDailyAttendance()">ĐIỂM DANH HÔM NAY</button>
+            <button class="btn-action" style="width:100%; margin-top:20px; padding:12px; background:var(--text-main); color:white;" onclick="claimDailyAttendance()">ĐIỂM DANH HÔM NAY</button>
         </div>
     </div>
 
-    <!-- DIALOG TIỆM ĐỔI QUÀ -->
+    <!-- POPUP 2: NÔNG TRẠI CHĂM SÓC CÂY TRỒNG -->
+    <div class="overlay" id="pop-garden">
+        <div class="popup" style="max-width: 460px;">
+            <i class="fas fa-times close-popup" onclick="closePopup('pop-garden')"></i>
+            <h3 style="font-size:15px; font-weight:800;">Khu Vườn Ngọt Ngào</h3>
+            <p style="font-size: 12px; color: var(--text-muted);">Chọn hạt giống bên phải và chạm vào ô đất để trồng.</p>
+            <div class="garden-layout">
+                <div class="garden-grid">
+                    <div class="plot" id="plot-0" onclick="clickPlot(0)"><span class="plot-emoji" id="p-emoji-0">🤎</span><div class="plot-timer" id="p-time-0" style="display:none;"></div></div>
+                    <div class="plot" id="plot-1" onclick="clickPlot(1)"><span class="plot-emoji" id="p-emoji-1">🤎</span><div class="plot-timer" id="p-time-1" style="display:none;"></div></div>
+                    <div class="plot" id="plot-2" onclick="clickPlot(2)"><span class="plot-emoji" id="p-emoji-2">🤎</span><div class="plot-timer" id="p-time-2" style="display:none;"></div></div>
+                    <div class="plot" id="plot-3" onclick="clickPlot(3)"><span class="plot-emoji" id="p-emoji-3">🤎</span><div class="plot-timer" id="p-time-3" style="display:none;"></div></div>
+                    <div class="plot" id="plot-4" onclick="clickPlot(4)"><span class="plot-emoji" id="p-emoji-4">🤎</span><div class="plot-timer" id="p-time-4" style="display:none;"></div></div>
+                    <div class="plot" id="plot-5" onclick="clickPlot(5)"><span class="plot-emoji" id="p-emoji-5">🤎</span><div class="plot-timer" id="p-time-5" style="display:none;"></div></div>
+                </div>
+                <div class="seed-sidebar" id="sidebar-seeds"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUP 3: TIỆM ĐỔI QUÀ -->
     <div class="overlay" id="pop-shop">
         <div class="popup">
             <i class="fas fa-times close-popup" onclick="closePopup('pop-shop')"></i>
-            <h3 style="font-size:16px; font-weight:800; margin-bottom:20px;">Tiệm Đổi Quà Tặng</h3>
+            <h3 style="font-size:15px; font-weight:800;">Cửa Hàng Quà Tặng</h3>
             <div class="list-group" id="list-shop-items"></div>
         </div>
     </div>
 
-    <!-- DIALOG BẢNG ĐIỀU PHỐI ĐIỂM -->
+    <!-- POPUP 4: NHẬT KÝ HỆ THỐNG -->
+    <div class="overlay" id="pop-logs">
+        <div class="popup">
+            <i class="fas fa-times close-popup" onclick="closePopup('pop-logs')"></i>
+            <h3 style="font-size:15px; font-weight:800; margin-bottom:10px;">Nhật Ký Biến Động</h3>
+            <div class="list-group" id="history-logs" style="max-height: 320px;">
+                <div class="item-card">Đang kết nối dữ liệu đám mây...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUP PHỤ: XÁC THỰC MẬT KHẨU QUẢN TRỊ VIÊN -->
+    <div class="overlay" id="pop-auth">
+        <div class="popup" style="max-width: 355px; text-align: center;">
+            <i class="fas fa-times close-popup" onclick="closePopup('pop-auth')"></i>
+            <h3 style="font-size:15px; font-weight:800;">Xác Thực QTV</h3>
+            <input type="password" id="admin-password-input" class="pwd-input" placeholder="•••••" maxlength="8">
+            <button class="btn-action" style="width:100%; margin-top:15px; padding:12px; background:var(--text-main); color:white;" onclick="verifyAdminPassword()">ĐĂNG NHẬP HỆ THỐNG</button>
+        </div>
+    </div>
+
+    <!-- POPUP BẢNG ĐIỀU PHỐI ĐIỂM CỦA ADMIN -->
     <div class="overlay" id="pop-admin-panel">
         <div class="popup" style="max-width:460px;">
             <i class="fas fa-times close-popup" onclick="closePopup('pop-admin-panel')"></i>
@@ -233,7 +229,7 @@
         </div>
     </div>
 
-    <!-- ================= CORE LOGIC SYSTEM ================= -->
+    <!-- ================= CORE CODE LOGIC SYSTEM ================= -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, onValue, set, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -331,12 +327,12 @@
             if (data) {
                 Object.values(data).reverse().slice(0, 15).forEach(log => {
                     const div = document.createElement('div');
-                    div.className = 'history-item';
+                    div.className = 'item-card';
                     div.innerText = log;
                     logBox.appendChild(div);
                 });
             } else {
-                logBox.innerHTML = '<div class="history-item">Không có lịch sử hoạt động.</div>';
+                logBox.innerHTML = '<div class="item-card">Không có lịch sử hoạt động.</div>';
             }
         });
 
@@ -381,9 +377,9 @@
                 const f = flowersCatalog[key];
                 return `
                     <div class="seed-item" id="seed-${key}" onclick="selectSeed('${key}')">
-                        <span style="font-size:20px; margin-bottom:4px;">${f.emoji}</span>
-                        <div style="font-size:11px; color:var(--text-main); line-height:1.2;">${f.name}</div>
-                        <div style="color:var(--text-muted); font-size:10px; margin-top:2px;">${f.buy}đ</div>
+                        <span style="font-size:18px; margin-bottom:2px;">${f.emoji}</span>
+                        <div style="font-size:10px; color:var(--text-main); line-height:1.1;">${f.name}</div>
+                        <div style="color:var(--text-muted); font-size:9px;">${f.buy}đ</div>
                     </div>
                 `;
             }).join('');
@@ -517,7 +513,7 @@
 
                 if (plot.status === 'empty') {
                     plotEl.className = "plot";
-                    emojiEl.innerText = "🤎"; // Đất trống dễ thương
+                    emojiEl.innerText = "🤎";
                     timerEl.style.display = 'none';
                 } else {
                     const flower = flowersCatalog[plot.plantKey];
@@ -525,13 +521,13 @@
 
                     if (timeLeft > 0) {
                         plotEl.className = "plot growing-state";
-                        emojiEl.innerText = "🌱"; // Mầm non đang lớn
+                        emojiEl.innerText = "🌱";
                         timerEl.className = "plot-timer";
                         timerEl.style.display = 'block';
                         timerEl.innerText = `${timeLeft}s`;
                     } else {
                         plotEl.className = "plot harvest-state";
-                        emojiEl.innerText = flower.emoji; // Hoa nở rực rỡ
+                        emojiEl.innerText = flower.emoji;
                         timerEl.className = "plot-timer ready";
                         timerEl.style.display = 'block';
                         timerEl.innerText = "Thu hoạch";
