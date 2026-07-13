@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tích Điểm</title>
+    <title>Tích Điểm & Nông Trại</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -45,9 +45,23 @@
         
         h1 { text-align: center; font-size: 24px; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 25px; color: var(--text-main); }
         
-        .score-box { background: var(--pastel-pink); padding: 35px 20px; border-radius: var(--radius-md); text-align: center; margin-bottom: 30px; position: relative; }
+        .score-box { background: var(--pastel-pink); padding: 35px 20px; border-radius: var(--radius-md); text-align: center; margin-bottom: 25px; position: relative; }
         .score-num { font-size: 64px; font-weight: 900; color: var(--text-main); letter-spacing: -2px; line-height: 1; margin-bottom: 12px; }
         .streak-info { font-size: 13px; font-weight: 700; color: var(--text-main); background: var(--bg-card); padding: 6px 18px; border-radius: 30px; display: inline-block; }
+
+        /* --- KHU VỰC NHIỆM VỤ HÀNG NGÀY --- */
+        .quest-section { background: #fffcfc; border: 2px dashed var(--pastel-pink-dark); border-radius: var(--radius-md); padding: 20px; margin-bottom: 25px; }
+        .quest-section-title { font-size: 14px; font-weight: 800; color: var(--text-main); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+        .quest-list { display: flex; flex-direction: column; gap: 10px; max-height: 290px; overflow-y: auto; padding-right: 4px; }
+        .quest-card { display: flex; justify-content: space-between; align-items: center; background: white; border: 1px solid var(--border); padding: 12px 16px; border-radius: var(--radius-sm); gap: 10px; }
+        .quest-info { display: flex; flex-direction: column; gap: 2px; max-width: 70%; }
+        .quest-title { font-size: 13px; font-weight: 700; color: var(--text-main); }
+        .quest-reward { font-size: 11px; font-weight: 800; color: var(--accent-green); }
+        .btn-quest { padding: 8px 14px; font-size: 11px; font-weight: 800; border-radius: 20px; cursor: pointer; border: 1px solid var(--text-main); background: white; transition: 0.2s; white-space: nowrap; }
+        .btn-quest.done { background: var(--pastel-green); color: var(--accent-green); border-color: #a5d6a7; cursor: default; }
+        .btn-quest.todo { background: var(--pastel-pink); color: var(--text-main); border-color: var(--pastel-pink-dark); }
+        .btn-quest.claimable { background: var(--text-main); color: white; animation: pulseBtn 1s infinite alternate; }
+        @keyframes pulseBtn { from { transform: scale(1); } to { transform: scale(1.04); } }
 
         /* 4 Ô CHỨC NĂNG TRANG CHỦ */
         .grid-menu-4 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 10px; }
@@ -62,7 +76,6 @@
         .popup { background: var(--bg-card); border-radius: var(--radius-lg); padding: 35px; width: 100%; max-width: 550px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.1); border: 1px solid var(--border); animation: popScale 0.25s ease-out; }
         @keyframes popScale { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         
-        /* Dấu X thoát quay về trang chủ */
         .close-popup { position: absolute; top: 22px; right: 22px; font-size: 20px; cursor: pointer; color: var(--text-muted); transition: 0.2s; width: 36px; height: 36px; display: flex; justify-content: center; align-items: center; border-radius: 50%; background: var(--bg-body); }
         .close-popup:hover { color: var(--text-main); background: var(--pastel-pink); transform: rotate(90deg); }
         
@@ -111,7 +124,6 @@
         .btn-reset-tab { font-size: 12px; font-weight: 800; color: var(--accent-red); background: #ffebee; border: 1px solid #ffcdd2; padding: 6px 12px; border-radius: 20px; cursor: pointer; margin-left: auto; transition: 0.2s; }
         .btn-reset-tab:hover { background: var(--accent-red); color: white; transform: scale(1.02); }
         
-        /* NÚT QUẢN TRỊ VIÊN CHÍNH */
         .admin-secret-btn { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); font-size: 12px; color: var(--text-muted); background: none; border: none; cursor: pointer; font-weight: 700; padding: 4px 10px; transition: 0.2s; }
         .admin-secret-btn:hover { color: var(--pastel-pink-dark); }
     </style>
@@ -131,6 +143,12 @@
         <div class="score-box">
             <div class="score-num" id="total-score">0</div>
             <div class="streak-info" id="streak-text">Chuỗi tích lũy: 0 ngày</div>
+        </div>
+
+        <div class="quest-section">
+            <div class="quest-section-title"><i class="fas fa-tasks" style="color: var(--pastel-pink-dark)"></i> Nhiệm Vụ Hôm Nay</div>
+            <div class="quest-list" id="quest-list-container">
+                </div>
         </div>
 
         <div class="grid-menu-4">
@@ -244,16 +262,13 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
+        // Danh sách của Admin (Đã bỏ bớt các mục daily tự động chuyển sang phần Nhiệm vụ người dùng)
         const plusActions = [
-            { text: "Chúc buổi sáng / buổi tối", pts: 10 },
-            { text: "Ăn uống đủ 3 bữa", pts: 10 },
             { text: "Nghe lời", pts: 5 },
             { text: "Ngoan ngoãn", pts: 5 },
             { text: "Ngày hoàn hảo không trừ điểm", pts: 30 },
             { text: "Hành động tinh tế", pts: 5 },
-            { text: "Nói yêu thương (Tối đa 1 lần/ngày)", pts: 10 },
             { text: "Nhắn tin tương tác khi đang giận", pts: 5 },
-            { text: "Gửi ảnh cập nhật hàng daily", pts: 5 },
             { text: "Chia sẻ video thú vị", pts: 0.1 },
             { text: "Gửi ảnh fit check/vóc dáng", pts: 30 }
         ];
@@ -289,11 +304,33 @@
             lotus: { name: "Hoa Sen", buy: 450, sell: 2100, time: 43200, emoji: "🪷" }
         };
 
+        // 📝 DANH SÁCH ĐỊNH NGHĨA 7 NHIỆM VỤ NGÀY (BAO GỒM CÁC NV CHÀO BUỔI SÁNG, ĂN UỐNG,...)
+        const defaultQuests = {
+            attendance: { title: "Điểm danh ngày hôm nay ☀️", reward: 5, target: 1, type: "auto" },
+            morning: { title: "Chúc buổi sáng / buổi tối ngọt ngào 🥰", reward: 10, target: 1, type: "click" },
+            meals: { title: "Ăn uống đầy đủ cả 3 bữa trong ngày 🥞", reward: 10, target: 1, type: "click" },
+            love: { title: "Nói lời yêu thương chân thành (1 lần/ngày) 💖", reward: 10, target: 1, type: "click" },
+            daily_pic: { title: "Gieo gửi ảnh cập nhật trạng thái hàng ngày 📸", reward: 5, target: 1, type: "click" },
+            plant: { title: "Gieo mầm hạt giống bất kỳ 🌱", reward: 15, target: 1, type: "auto" },
+            harvest: { title: "Thu hoạch hoa chín bất kỳ 🧺", reward: 25, target: 1, type: "auto" }
+        };
+
         let currentScore = 0;
         let selectedSeedKey = null;
         let currentStreak = 0;
         let firebaseAttendance = {};
         let localPlots = Array(6).fill().map(() => ({ status: 'empty', plantKey: '', timeEnd: 0 }));
+        
+        // Khởi tạo biến trạng thái nhiệm vụ mặc định
+        let currentQuestsState = { 
+            attendance: 0, morning: 0, meals: 0, love: 0, daily_pic: 0, plant: 0, harvest: 0, 
+            claimed: { attendance: false, morning: false, meals: false, love: false, daily_pic: false, plant: false, harvest: false } 
+        };
+
+        function getTodayKey() {
+            const now = new Date();
+            return `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
+        }
 
         window.showToast = function(msg) {
             const container = document.getElementById('toast-container');
@@ -315,6 +352,7 @@
 
         window.closePopup = function(id) { document.getElementById(id).style.display = 'none'; };
 
+        // FIREBASE REALTIME LISTENERS
         onValue(ref(db, 'score'), (snapshot) => {
             currentScore = snapshot.val() || 0;
             document.getElementById('total-score').innerText = Number(currentScore).toFixed(1).replace('.0', '');
@@ -328,6 +366,34 @@
         onValue(ref(db, 'attendance'), (snapshot) => {
             firebaseAttendance = snapshot.val() || {};
             renderAttendanceGrid();
+            if(firebaseAttendance[getTodayKey()]) {
+                updateQuestProgress('attendance', 1);
+            }
+        });
+
+        onValue(ref(db, `quests/${getTodayKey()}`), (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                currentQuestsState = {
+                    attendance: data.attendance || 0,
+                    morning: data.morning || 0,
+                    meals: data.meals || 0,
+                    love: data.love || 0,
+                    daily_pic: data.daily_pic || 0,
+                    plant: data.plant || 0,
+                    harvest: data.harvest || 0,
+                    claimed: data.claimed || {}
+                };
+                // Đảm bảo không bị lỗi undefined object con
+                if(!currentQuestsState.claimed) currentQuestsState.claimed = {};
+            } else {
+                currentQuestsState = { 
+                    attendance: firebaseAttendance[getTodayKey()] ? 1 : 0, 
+                    morning: 0, meals: 0, love: 0, daily_pic: 0, plant: 0, harvest: 0, 
+                    claimed: { attendance: false, morning: false, meals: false, love: false, daily_pic: false, plant: false, harvest: false } 
+                };
+            }
+            renderQuestsUI();
         });
 
         onValue(ref(db, 'history'), (snapshot) => {
@@ -350,11 +416,77 @@
             const data = snapshot.val();
             if (data && Array.isArray(data)) {
                 localPlots = data;
-            } else {
-                localPlots = Array(6).fill().map(() => ({ status: 'empty', plantKey: '', timeEnd: 0 }));
             }
             renderGardenGrid();
         });
+
+        function updateQuestProgress(type, countToAdd) {
+            if (!currentQuestsState[type]) currentQuestsState[type] = 0;
+            if (currentQuestsState[type] < defaultQuests[type].target) {
+                currentQuestsState[type] = Math.min(defaultQuests[type].target, currentQuestsState[type] + countToAdd);
+                set(ref(db, `quests/${getTodayKey()}`), currentQuestsState);
+            }
+        }
+
+        // RENDER GIAO DIỆN NHIỆM VỤ HÀNG NGÀY
+        function renderQuestsUI() {
+            const container = document.getElementById('quest-list-container');
+            container.innerHTML = Object.keys(defaultQuests).map(key => {
+                const q = defaultQuests[key];
+                const progress = currentQuestsState[key] || 0;
+                const isClaimed = currentQuestsState.claimed[key] || false;
+                const isDone = progress >= q.target;
+
+                let btnHtml = '';
+                if (isClaimed) {
+                    btnHtml = `<button class="btn-quest done">Đã nhận</button>`;
+                } else if (isDone) {
+                    btnHtml = `<button class="btn-quest claimable" onclick="claimQuestReward('${key}')">Nhận thưởng</button>`;
+                } else {
+                    if (q.type === "click") {
+                        // Loại người dùng tự bấm để làm (ví dụ: Chúc buổi sáng)
+                        btnHtml = `<button class="btn-quest todo" onclick="doClickQuest('${key}')">Làm ngay</button>`;
+                    } else {
+                        // Loại tự động đếm (như Trồng cây, Điểm danh)
+                        btnHtml = `<button class="btn-quest" style="color:var(--text-muted); border-color:var(--border);" disabled>${progress}/${q.target}</button>`;
+                    }
+                }
+
+                let displayTitle = q.title;
+                if(key === 'plant') displayTitle = `Gieo mầm hạt giống bất kỳ (${progress}/${q.target})`;
+                if(key === 'harvest') displayTitle = `Thu hoạch hoa chín bất kỳ (${progress}/${q.target})`;
+
+                return `
+                    <div class="quest-card">
+                        <div class="quest-info">
+                            <span class="quest-title" style="${isClaimed ? 'text-decoration: line-through; color:var(--text-muted);' : ''}">${displayTitle}</span>
+                            <span class="quest-reward">+${q.reward}đ</span>
+                        </div>
+                        ${btnHtml}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // NGƯỜI DÙNG BẤM LÀM NHIỆM VỤ HÀNH ĐỘNG THỦ CÔNG
+        window.doClickQuest = function(key) {
+            updateQuestProgress(key, 1);
+            showToast(`✨ Đã thực hiện: ${defaultQuests[key].title}. Giờ bạn có thể nhận thưởng!`);
+        };
+
+        // BẤM NHẬN THƯỞNG NHIỆM VỤ
+        window.claimQuestReward = function(key) {
+            if (currentQuestsState.claimed[key]) return;
+            
+            const reward = defaultQuests[key].reward;
+            if(!currentQuestsState.claimed) currentQuestsState.claimed = {};
+            currentQuestsState.claimed[key] = true;
+            
+            set(ref(db, 'score'), currentScore + reward);
+            set(ref(db, `quests/${getTodayKey()}`), currentQuestsState);
+            push(ref(db, 'history'), `[+${reward}đ] Hoàn thành NV ngày: ${defaultQuests[key].title}`);
+            showToast(`🎁 Nhận thưởng thành công +${reward}đ!`);
+        };
 
         function initApp() {
             document.getElementById('admin-add-list').innerHTML = plusActions.map(m => `
@@ -429,16 +561,14 @@
         };
 
         window.resetAllPoints = function() {
-            const confirmReset = confirm("⚠️ CẢNH BÁO TỐI CAO:\nHành động này sẽ XÓA SẠCH TOÀN BỘ: Điểm số, Chuỗi ngày tích lũy và Nhật ký lịch sử cũ về trạng thái trống trơn ban đầu. Bạn chắc chắn muốn reset chứ?");
+            const confirmReset = confirm("⚠️ CẢNH BÁO TỐI CAO:\nHành động này sẽ XÓA SẠCH điểm, chuỗi ngày và nhật ký cũ.");
             if (confirmReset) {
                 set(ref(db, 'score'), 0);
                 set(ref(db, 'streak'), 0);
-                
                 remove(ref(db, 'history')).then(() => {
-                    push(ref(db, 'history'), `[Hệ thống] QTV đã thực hiện Reset Toàn Diện. Toàn bộ điểm số, chuỗi ngày và nhật ký cũ đã được dọn dẹp sạch sẽ.`);
+                    push(ref(db, 'history'), `[Hệ thống] QTV đã thực hiện Reset Toàn Diện.`);
                 });
-                
-                showToast("🔄 Đã reset điểm số, chuỗi ngày và nhật ký hệ thống!");
+                showToast("🔄 Đã dọn dẹp hệ thống!");
             }
         };
 
@@ -449,17 +579,12 @@
             }
             set(ref(db, 'score'), currentScore - cost);
             push(ref(db, 'history'), `[-${cost}đ] Đã đổi quà tặng: ${giftName}`);
-            showToast("🎁 Đổi quà thành công! Hãy chụp màn hình gửi đi nhé.");
+            showToast("🎁 Đổi quà thành công!");
         };
 
         window.claimDailyAttendance = function() {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = now.getMonth() + 1;
-            const date = now.getDate();
-            const todayKey = `${year}-${month}-${date}`;
-
-            let currentDayOfWeek = now.getDay(); 
+            const todayKey = getTodayKey();
+            let currentDayOfWeek = new Date().getDay(); 
             let displayDayIndex = currentDayOfWeek === 0 ? 7 : currentDayOfWeek;
 
             if (firebaseAttendance[todayKey]) {
@@ -521,12 +646,13 @@
                 set(ref(db, 'plots'), localPlots);
                 push(ref(db, 'history'), `[-${flower.buy}đ] Tiến hành gieo mầm ${flower.name}`);
                 showToast(`🌱 Gieo hạt ${flower.name} thành công.`);
+
+                updateQuestProgress('plant', 1);
                 
                 selectedSeedKey = null;
                 document.querySelectorAll('.seed-item').forEach(el => el.classList.remove('selected'));
             } 
             else if (plot.status === 'growing') {
-                // Kiểm tra thực tế xem tại thời điểm click cây đã chín chưa
                 if (now >= plot.timeEnd) {
                     const flower = flowersCatalog[plot.plantKey];
                     set(ref(db, 'score'), currentScore + flower.sell);
@@ -535,6 +661,8 @@
 
                     localPlots[index] = { status: 'empty', plantKey: '', timeEnd: 0 };
                     set(ref(db, 'plots'), localPlots);
+
+                    updateQuestProgress('harvest', 1);
                 } else {
                     showToast("⏳ Cây vẫn đang trong quá trình lớn, hãy kiên nhẫn đợi thêm nha.");
                 }
@@ -560,7 +688,6 @@
                     const flower = flowersCatalog[plot.plantKey];
                     const diff = plot.timeEnd - now;
 
-                    // Chỉ xử lý giao diện thuần túy, KHÔNG SET dữ liệu ngược về Firebase tại đây để tránh loop vô hạn
                     if (diff > 0) {
                         plotEl.className = "plot growing-state";
                         emojiEl.innerText = "🌱";
@@ -590,4 +717,4 @@
         }, 1000);
     </script>
 </body>
-</html>
+</html>m
