@@ -234,7 +234,7 @@
             <div class="tabs-header">
                 <button id="tab-add" class="tab-link active" onclick="switchAdminTab('add')">CỘNG ĐIỂM</button>
                 <button id="tab-sub" class="tab-link" onclick="switchAdminTab('sub')">TRỪ ĐIỂM</button>
-                <!-- NÚT RESET ĐIỂM & CHUỖI TÍCH LŨY -->
+                <!-- NÚT RESET TOÀN DIỆN -->
                 <button class="btn-reset-tab" onclick="resetAllPoints()">🔄 RESET ĐIỂM</button>
             </div>
             <div id="admin-add-list" class="list-group"></div>
@@ -245,7 +245,7 @@
     <!-- ================= CORE CODE LOGIC SYSTEM ================= -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, onValue, set, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, onValue, set, push, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCJip89os02VXHsbdFoad3o_S7QpX0ce6Y",
@@ -436,14 +436,19 @@
             showToast(`✅ Đã điều phối ${pts > 0 ? `+${pts}` : pts} điểm!`);
         };
 
-        // CẬP NHẬT: RESET ĐỒNG THỜI ĐIỂM SỐ VÀ CHUỖI TÍCH LŨY (STREAK)
+        // CẬP NHẬT: RESET TOÀN BỘ ĐIỂM SỐ, CHUỖI TÍCH LŨY VÀ XÓA SẠCH LỊCH SỬ NHẬT KÝ
         window.resetAllPoints = function() {
-            const confirmReset = confirm("⚠️ CẢNH BÁO QUAN TRỌNG:\nBạn có chắc chắn muốn đặt lại (Reset) TOÀN BỘ ĐIỂM SỐ và CHUỖI NGÀY TÍCH LŨY về 0 không? Thao tác này sẽ xóa sạch dữ liệu chuỗi ngày hiện tại!");
+            const confirmReset = confirm("⚠️ CẢNH BÁO TỐI CAO:\nHành động này sẽ XÓA SẠCH TOÀN BỘ: Điểm số, Chuỗi ngày tích lũy và Nhật ký lịch sử cũ về trạng thái trống trơn ban đầu. Bạn chắc chắn muốn reset chứ?");
             if (confirmReset) {
                 set(ref(db, 'score'), 0);
-                set(ref(db, 'streak'), 0); // Reset chuỗi tích lũy về 0
-                push(ref(db, 'history'), `[Reset] QTV đã đặt lại toàn bộ điểm số và chuỗi tích lũy về 0`);
-                showToast("🔄 Đã reset điểm và chuỗi tích lũy về 0!");
+                set(ref(db, 'streak'), 0);
+                
+                // Thực hiện xóa hoàn toàn nhánh lịch sử cũ sau đó chèn 1 dòng thông báo reset duy nhất
+                remove(ref(db, 'history')).then(() => {
+                    push(ref(db, 'history'), `[Hệ thống] QTV đã thực hiện Reset Toàn Diện. Toàn bộ điểm số, chuỗi ngày và nhật ký cũ đã được dọn dẹp sạch sẽ.`);
+                });
+                
+                showToast("🔄 Đã reset điểm số, chuỗi ngày và nhật ký hệ thống!");
             }
         };
 
